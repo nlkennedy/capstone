@@ -7,6 +7,8 @@ from keras.preprocessing.image import ImageDataGenerator
 from skimage.transform import resize
 import time
 
+prediction = ''
+
 # Loading the model and loading weights into new model
 json_file = open("model.json", "r")
 model_json = json_file.read()
@@ -37,6 +39,7 @@ while camera.isOpened():
     frame = cv2.flip(frame, 1)
     cv2.rectangle(frame, (int(0.5 * frame.shape[1]), 0),
                   (frame.shape[1], int(0.8 * frame.shape[0])), (255, 0, 0), 2)
+    cv2.putText(frame, f"Prediction: {prediction}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
     cv2.imshow('Original', frame)
 
     if isBgCaptured == 1:
@@ -71,9 +74,9 @@ while camera.isOpened():
         # Sorting based on top prediction
         prediction = sorted(prediction.items(), key=operator.itemgetter(1), reverse=True)
         print(prediction)
-
+        prediction = prediction[0][0]
         # Displaying the predictions
-        cv2.putText(frame, prediction[0][0], (10, 120), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)    
+        # cv2.putText(frame, prediction[0][0], (10, 120), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)    
         cv2.imshow("Original", frame)
     elif interrupt & 0xFF == ord('q'): # esc key
         break
