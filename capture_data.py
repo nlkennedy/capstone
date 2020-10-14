@@ -15,6 +15,7 @@ if not os.path.exists("data"):
     os.makedirs("data")
     os.makedirs("data/stroke")
     os.makedirs("data/let")
+    os.makedirs("data/none")
     
 
 # training mode 
@@ -37,13 +38,16 @@ while camera.isOpened():
 
     # Getting count of existing images
     count = {'stroke': len(os.listdir(directory+"stroke")),
-             'let': len(os.listdir(directory+"let"))}
+             'let': len(os.listdir(directory+"let")),
+             'none': len(os.listdir(directory+"none")),
+            }
     
     # Printing the count in each set to the screen
     cv2.putText(frame, "MODE : "+mode, (10, 50), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
     cv2.putText(frame, "IMAGE COUNT", (10, 100), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
     cv2.putText(frame, "STROKE : "+str(count['stroke']), (10, 120), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
     cv2.putText(frame, "LET : "+str(count['let']), (10, 140), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
+    cv2.putText(frame, "NONE : "+str(count['none']), (10, 160), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
     cv2.imshow('Original', frame)
 
     if isBgCaptured == 1:
@@ -68,6 +72,8 @@ while camera.isOpened():
         cv2.imwrite(directory+'stroke/'+str(count['stroke'])+'.jpg', thresh)
     elif interrupt & 0xFF == ord('l'):
         cv2.imwrite(directory+'let/'+str(count['let'])+'.jpg', thresh)
+    elif interrupt & 0xFF == ord('n'):
+        cv2.imwrite(directory+'none/'+str(count['none'])+'.jpg', thresh)
     
 camera.release()
 cv2.destroyAllWindows()
