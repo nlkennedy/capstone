@@ -27,7 +27,7 @@ def remove_background(frame):
     return res
 
 # Category dictionary
-categories = {0: 'Let', 1: 'None', 2: 'Stroke'}
+categories = {0: 'Let', 1: 'No Let', 2: 'None', 3: 'Stroke'}
 
 camera = cv2.VideoCapture(0)
 camera.set(10,200)
@@ -66,8 +66,9 @@ while camera.isOpened():
         print(result)
         prediction = {
             'Let': result[0][0], 
-            'None': result[0][1],
-            'Stroke': result[0][2]
+            'No Let': result[0][1],
+            'None': result[0][2],
+            'Stroke': result[0][3]
         }
         # Sorting based on top prediction
         prediction = sorted(prediction.items(), key=operator.itemgetter(1), reverse=True)
