@@ -1,5 +1,6 @@
 import numpy as np
-from keras.models import model_from_json
+from keras.models import load_model
+# from keras.models import model_from_json
 import operator
 import cv2
 import sys, os
@@ -10,11 +11,12 @@ import time
 prediction = ''
 
 # Loading the model and loading weights into new model
-json_file = open("model.json", "r")
-model_json = json_file.read()
-json_file.close()
-loaded_model = model_from_json(model_json)
-loaded_model.load_weights("model.h5")
+# json_file = open("model.json", "r")
+# model_json = json_file.read()
+# json_file.close()
+# loaded_model = model_from_json(model_json)
+# loaded_model.load_weights("model.h5")
+loaded_model = load_model("model_new.h5")
 print("Loaded model from disk")
 
 def remove_background(frame):
@@ -25,7 +27,7 @@ def remove_background(frame):
     return res
 
 # Category dictionary
-categories = {0: 'Let', 1: 'Stoke'}
+categories = {0: 'Let', 1: 'Stroke', 2: 'None'}
 
 camera = cv2.VideoCapture(0)
 camera.set(10,200)
@@ -69,8 +71,11 @@ while camera.isOpened():
         # generate prediction using trained model
         result = loaded_model.predict(image)
         print(result)
-        prediction = {'Let': result[0][0], 
-                      'Stroke': result[0][1]}
+        prediction = {
+            'Let': result[0][0], 
+            'Stroke': result[0][1],
+            'None': result[0][2]
+        }
         # Sorting based on top prediction
         prediction = sorted(prediction.items(), key=operator.itemgetter(1), reverse=True)
         print(prediction)
