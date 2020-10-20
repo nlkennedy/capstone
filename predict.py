@@ -53,24 +53,17 @@ while camera.isOpened():
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray,(41,41),0)
         ret, thresh = cv2.threshold(blur,60,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-        cv2.imshow("ROI", thresh)   
-
-    interrupt = cv2.waitKey(10)
-    if interrupt & 0xFF == ord('b'):
-        bgModel = cv2.createBackgroundSubtractorMOG2(0, 50)
-        isBgCaptured = 1
-        print('Captured Background!')
-    elif interrupt & 0xFF == ord('s'):
-        print(thresh.shape)
-        print(type(thresh))
+        cv2.imshow("ROI", thresh)
+        # print(thresh.shape)
+        # print(type(thresh))
         image = resize(thresh, (64, 64))
-        print(image.shape)
+        # print(image.shape)
         image = image.reshape(1, 64, 64, 1)
-        print(image.shape)
+        # print(image.shape)
 
         # generate prediction using trained model
         result = loaded_model.predict(image)
-        print(result)
+        # print(result)
         prediction = {
             'Let': result[0][0], 
             'Stroke': result[0][1],
@@ -82,7 +75,16 @@ while camera.isOpened():
         prediction = prediction[0][0]
         # Displaying the predictions
         # cv2.putText(frame, prediction[0][0], (10, 120), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)    
-        cv2.imshow("Original", frame)
+        cv2.imshow("Original", frame)  
+
+    interrupt = cv2.waitKey(10)
+    if interrupt & 0xFF == ord('b'):
+        bgModel = cv2.createBackgroundSubtractorMOG2(0, 50)
+        isBgCaptured = 1
+        # print('Captured Background!')
+    elif interrupt & 0xFF == ord('s'):
+        isBgCaptured = 0
+        # print('Stopping prediction capturing')
     elif interrupt & 0xFF == ord('q'): # esc key
         break
 
