@@ -16,7 +16,7 @@ prediction = ''
 # json_file.close()
 # loaded_model = model_from_json(model_json)
 # loaded_model.load_weights("model.h5")
-loaded_model = load_model("model_new.h5")
+loaded_model = load_model("model.h5")
 print("Loaded model from disk")
 
 def remove_background(frame):
