@@ -46,14 +46,14 @@ train_datagen = ImageDataGenerator(
 
 test_datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
 
-training_set = train_datagen.flow_from_directory('data/',
+training_set = train_datagen.flow_from_directory('data/train/',
                                                  target_size=(64, 64),
                                                  batch_size=batch_size,
                                                  color_mode='grayscale',
                                                  class_mode='categorical',
                                                  subset='training')
 
-test_set = test_datagen.flow_from_directory('data/', # same as train not test
+test_set = test_datagen.flow_from_directory('data/train/', # same as train not test
                                             target_size=(64, 64),
                                             batch_size=batch_size,
                                             color_mode='grayscale',
@@ -70,9 +70,10 @@ classifier.fit(
 )
 
 # Saving the model
-model_json = classifier.to_json()
-with open("model.json", "w") as json_file:
-    json_file.write(model_json)
-classifier.save_weights('model.h5')
+# model_json = classifier.to_json()
+# with open("model.json", "w") as json_file:
+#     json_file.write(model_json)
+# classifier.save_weights('model.h5')
 
-classifier.save("model_new.h5")
+# new way to save
+classifier.save("model.h5")

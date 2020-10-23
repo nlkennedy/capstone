@@ -13,15 +13,16 @@ def remove_background(frame):
 # Run once to create the directory structure
 if not os.path.exists("data"):
     os.makedirs("data")
-    os.makedirs("data/stroke")
-    os.makedirs("data/let")
-    os.makedirs("data/nolet")
-    os.makedirs("data/none")
+    os.makedirs("data/train")
+    os.makedirs("data/train/stroke")
+    os.makedirs("data/train/let")
+    os.makedirs("data/train/nolet")
+    os.makedirs("data/train/none")
     
 
 # training mode 
 mode = 'train'
-directory = 'data/'
+directory = 'data/train/'
 
 camera = cv2.VideoCapture(0)
 camera.set(10,200)
