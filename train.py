@@ -24,7 +24,7 @@ classifier.add(Flatten())
 # Adding a fully connected layer
 classifier.add(Dense(units=128, activation='relu'))
 # units = number of classes
-classifier.add(Dense(units=4, activation='softmax')) # softmax for more than 2
+classifier.add(Dense(units=7, activation='softmax')) # softmax for more than 2
 
 # Compiling the CNN
 classifier.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy']) # categorical_crossentropy for more than 2
@@ -69,11 +69,4 @@ classifier.fit(
         verbose=2
 )
 
-# Saving the model
-# model_json = classifier.to_json()
-# with open("model.json", "w") as json_file:
-#     json_file.write(model_json)
-# classifier.save_weights('model.h5')
-
-# new way to save
 classifier.save("model.h5")
