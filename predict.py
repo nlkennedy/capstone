@@ -20,16 +20,17 @@ def remove_background(frame):
     return res
 
 # Category dictionary
-signals = {0: 'let', 1: 'let_l', 2: 'nolet', 3: 'nolet_l', 4: 'none', 5: 'stroke', 6: 'stroke_l'}
+# signals = {0: 'let', 1: 'let_l', 2: 'nolet', 3: 'nolet_l', 4: 'none', 5: 'stroke', 6: 'stroke_l'}
+signals = {0: 'let', 1: 'nolet', 2: 'none', 3: 'stroke'}
 signals_translated = {
     '': '', 
     'let': 'Let',
-    'let_l': 'Let',
+    # 'let_l': 'Let',
     'nolet': 'No Let', 
-    'nolet_l': 'No Let',  
+    # 'nolet_l': 'No Let',
     'none': 'None',
     'stroke': 'Stroke',
-    'stroke_l': 'Stroke'
+    # 'stroke_l': 'Stroke'
 }
 
 camera = cv2.VideoCapture(0)
@@ -44,8 +45,8 @@ while camera.isOpened():
     frame = cv2.flip(frame, 1)
     cv2.rectangle(frame, (int(0.5 * frame.shape[1]), 0),
                   (frame.shape[1], int(0.8 * frame.shape[0])), (255, 0, 0), 2)
-    cv2.putText(frame, f"Prediction: {signals_translated[prediction]}", (10, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
-    cv2.putText(frame, f"Actual: {prediction}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
+    # cv2.putText(frame, f"Prediction: {signals_translated[prediction]}", (10, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
+    cv2.putText(frame, f"Prediction: {prediction}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
     cv2.imshow('Original', frame)
 
     if isBgCaptured == 1:
