@@ -81,7 +81,7 @@ while camera.isOpened():
     elif interrupt & 0xFF == ord('l'):
         take_image('let', thresh)
     elif interrupt & 0xFF == ord('o'):
-        take_image('let_1', thresh)
+        take_image('let_l', thresh)
     elif interrupt & 0xFF == ord('f'):
         take_image('nolet', thresh)
     elif interrupt & 0xFF == ord('r'):
