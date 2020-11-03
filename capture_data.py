@@ -13,14 +13,16 @@ def remove_background(frame):
 # Run once to create the directory structure
 if not os.path.exists("data"):
     os.makedirs("data")
-    os.makedirs("data/stroke")
-    os.makedirs("data/let")
-    os.makedirs("data/none")
+    os.makedirs("data/train")
+    os.makedirs("data/train/stroke")
+    os.makedirs("data/train/let")
+    os.makedirs("data/train/nolet")
+    os.makedirs("data/train/none")
     
 
 # training mode 
 mode = 'train'
-directory = 'data/'
+directory = 'data/train/'
 
 camera = cv2.VideoCapture(0)
 camera.set(10,200)
@@ -39,6 +41,7 @@ while camera.isOpened():
     # Getting count of existing images
     count = {'stroke': len(os.listdir(directory+"stroke")),
              'let': len(os.listdir(directory+"let")),
+             'nolet': len(os.listdir(directory+"nolet")),
              'none': len(os.listdir(directory+"none")),
             }
     
@@ -47,7 +50,8 @@ while camera.isOpened():
     cv2.putText(frame, "IMAGE COUNT", (10, 100), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
     cv2.putText(frame, "STROKE : "+str(count['stroke']), (10, 120), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
     cv2.putText(frame, "LET : "+str(count['let']), (10, 140), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
-    cv2.putText(frame, "NONE : "+str(count['none']), (10, 160), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
+    cv2.putText(frame, "NO LET : "+str(count['nolet']), (10, 160), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
+    cv2.putText(frame, "NONE : "+str(count['none']), (10, 180), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
     cv2.imshow('Original', frame)
 
     if isBgCaptured == 1:
@@ -72,8 +76,10 @@ while camera.isOpened():
         cv2.imwrite(directory+'stroke/'+str(count['stroke'])+'.jpg', thresh)
     elif interrupt & 0xFF == ord('l'):
         cv2.imwrite(directory+'let/'+str(count['let'])+'.jpg', thresh)
+    elif interrupt & 0xFF == ord('f'):
+        cv2.imwrite(directory+'nolet/'+str(count['nolet'])+'.jpg', thresh)
     elif interrupt & 0xFF == ord('n'):
         cv2.imwrite(directory+'none/'+str(count['none'])+'.jpg', thresh)
-    
+
 camera.release()
 cv2.destroyAllWindows()
