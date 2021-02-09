@@ -76,11 +76,17 @@ WSGI_APPLICATION = 'hand_recognition.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': 'squashscoring',
+        'ENGINE': 'mysql.connector.django',
+        'USER': 'ref',
+        'PASSWORD': '$qua$hApp1',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'OPTIONS': {
+          'autocommit': True,
+        },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
