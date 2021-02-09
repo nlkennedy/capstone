@@ -1,0 +1,54 @@
+/* Example
+INSERT INTO table_name (column1, column2, column3, ...)
+VALUES (value1, value2, value3, ...);
+*/
+
+-- Teams
+INSERT INTO Teams (team_name)
+VALUES ('Tufts');
+
+INSERT INTO Teams (team_name)
+VALUES ('Bowdoin');
+
+-- Players
+INSERT INTO Players (team_id, first_name, last_name)
+VALUES (1, 'Radhika', 'Joshi');
+
+INSERT INTO Players (team_id, first_name, last_name)
+VALUES (1, 'Nicole', 'Kennedy');
+
+INSERT INTO Players (team_id, first_name, last_name)
+VALUES (2, 'Ben', 'Bodine');
+
+INSERT INTO Players (team_id, first_name, last_name)
+VALUES (2, 'Harsh', 'Prajapati');
+
+-- TeamMatches
+INSERT INTO TeamMatches (home_team_id, away_team_id, date_played)
+VALUES (1, 2, '2020-11-01');
+
+-- Matches
+INSERT INTO Matches (team_match_id, home_player_id, away_player_id, home_player_score, away_player_score, match_rank, court_number)
+VALUES (1, 1, 8, 11, 8, 1, 4);
+
+INSERT INTO Matches (team_match_id, home_player_id, away_player_id, home_player_score, away_player_score, match_rank, court_number)
+VALUES (1, 2, 7, 11, 8, 2, 5);
+
+-- Games
+INSERT INTO Games (match_id, home_player_score, away_player_score, game_number)
+VALUES (1, 11, 8, 1);
+
+INSERT INTO Games (match_id, home_player_score, away_player_score, game_number)
+VALUES (1, 11, 9, 2);
+
+INSERT INTO Games (match_id, home_player_score, away_player_score, game_number)
+VALUES (1, 11, 3, 3);
+
+INSERT INTO Games (match_id, home_player_score, away_player_score, game_number)
+VALUES (2, 11, 8, 1);
+
+INSERT INTO Games (match_id, home_player_score, away_player_score, game_number)
+VALUES (2, 11, 9, 2);
+
+INSERT INTO Games (match_id, home_player_score, away_player_score, game_number)
+VALUES (2, 11, 3, 3);
