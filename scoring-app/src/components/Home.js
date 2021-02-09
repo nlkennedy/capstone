@@ -5,14 +5,12 @@ class Home extends React.Component {
     render() {
         return (
             <div>
-                <div class="container">
-                    <div class="row" style={{ marginTop: '20%' }} >
-                        <div class="col-sm-6">
-                            <a class="btn-custom btn btn-secondary btn-lg" href="/create-matchup" role="button">Existing Team Matchup</a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a class="btn-custom btn btn-secondary btn-lg" href="/create-matchup" role="button">New Team Matchup</a>
-                        </div>
+                <div class="container" style={{ marginTop: '5%' }} >
+                    <div class="row justify-content-center" >
+                        <a class="btn-custom btn btn-secondary btn-lg" href="/create-matchup" role="button">New Team Matchup</a>
+                    </div>
+                    <div class="row justify-content-center">
+                        <a class="btn-custom btn btn-secondary btn-lg" href="/matchup/:team_matchup_id" role="button">Existing Team Matchup</a>
                     </div>
                 </div>
 

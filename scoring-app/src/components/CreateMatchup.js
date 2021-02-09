@@ -13,13 +13,19 @@ class CreateMatchup extends React.Component {
                         <div class="col-sm-1">
                             <h4>#</h4>
                         </div>
-                        <div class="col-sm-4">
-                            <h4>Team A</h4>
+                        <div class="col-sm-4">                            
+                            <div class="form-group">
+                                {/* <h4><label for="exampleInputEmail1">Team A</label></h4> */}
+                                <input type="text" class="form-control" placeholder="Team A" />
+                            </div>
                         </div>
                         <div class="col-sm-4">
-                            <h4>Team B</h4>
+                            <div class="form-group">
+                                {/* <h4><label for="exampleInputEmail1">Team A</label></h4> */}
+                                <input type="text" class="form-control" placeholder="Team B" />
+                            </div>
                         </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-3">
                             <h4>Court</h4>
                         </div>
                     </div>
@@ -42,10 +48,10 @@ class CreateMatchup extends React.Component {
                             <h4>2</h4>
                         </div>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" placeholder="Player 1A" />
+                            <input type="text" class="form-control" placeholder="Player 2A" />
                         </div>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" placeholder="Player 1B" />
+                            <input type="text" class="form-control" placeholder="Player 2B" />
                         </div>
                         <div class="col-sm-3">
                             <input type="text" class="form-control" placeholder="#" />
@@ -57,10 +63,10 @@ class CreateMatchup extends React.Component {
                             <h4>9</h4>
                         </div>
                         <div class="col-sm-4 form-group">
-                            <input type="text" class="form-control" placeholder="Player 1A" />
+                            <input type="text" class="form-control" placeholder="Player 3A" />
                         </div>
                         <div class="col-sm-4 form-group">
-                            <input type="text" class="form-control" placeholder="Player 1B" />
+                            <input type="text" class="form-control" placeholder="Player 3B" />
                         </div>
                         <div class="col-sm-3 form-group">
                             <input type="text" class="form-control" placeholder="#" />

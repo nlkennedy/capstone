@@ -19,15 +19,15 @@ class GameScoreboard extends React.Component {
                     </div>
                     <div class="row">
                         <div class="col-5 shaded-dark-gray">
-                            <h5 class="text-left">
+                            <h5 class="text-left text-light">
                                 First Name Last Name
                             </h5>
                         </div>
                         <div class="col-2 align-self-center">
-                            <h1>4 | 5</h1>
+                            <h1>2 | 1</h1>
                         </div>
                         <div class="col-5 shaded-dark-gray">
-                            <h5 class="text-right">
+                            <h5 class="text-right text-light">
                                 First Name Last Name
                             </h5>
                         </div>
