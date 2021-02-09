@@ -18,7 +18,6 @@ class App extends React.Component {
     return (
       <Router>
           <div className="App">
-            <div className="container">
             <Header />
             <Navbar />
               <Switch>
@@ -31,7 +30,6 @@ class App extends React.Component {
                 <Route exact path="/matchup/:team_matchup_id/summary" component={Summary} />
                 <Route component={NotFound} />
               </Switch>
-            </div>
           </div>
       </Router>
     );

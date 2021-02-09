@@ -11,3 +11,117 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Navbar */
+#logo {
+  /* change color to white */
+  filter: invert(100%) sepia(0%) saturate(924%) hue-rotate(282deg) brightness(118%) contrast(100%);
+}
+
+.navbar-custom { 
+  background-color: #474d65; 
+} 
+
+.navbar-custom .navbar-text { 
+  color: #ffffff; 
+} 
+
+/* Home / About Page */
+.btn-custom {
+  margin: 7%;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;   /* fixed height of footer */
+}
+
+/* Create Matchup */
+
+.form-box {
+  border: 1px solid #6c757d;
+  padding: 2%;
+}
+
+.matchup-row {
+  margin-bottom: 2%;
+  border-bottom: 1px solid #6c757d;
+}
+
+/* Matchup */
+.table-game-sum {
+  margin-bottom: 0rem !important;
+}
+
+.team1-winner {
+  background-color: rgba(71,77,101,0.7);
+}
+
+.team2-winner {
+  background-color: rgba(168,103,96,0.7);
+}
+
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.table > tbody > tr > th {
+  vertical-align: middle;
+}
+
+.matchup-header {
+  background-color: #e9ecef;
+}
+
+/* Game Scoring */
+.shaded-gray {
+  background-color: #e9ecef;
+  padding: 5%;
+  margin-bottom: 5%;
+}
+
+.shaded-red {
+  background-color: #a86760;
+  padding: 2.5% 0%;
+}
+
+.shaded-blue {
+  background-color: #474d65;
+  padding: 5%;
+}
+
+.shaded-orange {
+  background-color: #cdb58c;
+  border: 1px solid #6c757d;
+  padding: 5%;
+}
+
+.game-button {
+  border: 1px solid #6c757d;
+  padding: 5%;
+}
+
+/* Game Scoreboard */
+.scoreboard {
+  font-size: 7rem;
+  margin-bottom: .5rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.shaded-dark-gray {
+  background-color: #6c757d;
+}
+
+
+/* 
+COLORS
+  light gray: #f8f9fa (light)
+  dark gray: #6c757d (secondary)
+  navy: #474d65
+  red: #a86760
+  orange: #cdb58c
+  yellow: #dfd8ab
+*/
