@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import os 
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'itx1(-4uppf))4#!4&@&c4gtp+p4nrsmz!$r@dyn8$m1utar_%'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -76,12 +78,12 @@ WSGI_APPLICATION = 'hand_recognition.wsgi.application'
 
 DATABASES = {
     'default': {
-        'NAME': 'squashscoring',
+        'NAME': config('DATABASE'),
         'ENGINE': 'mysql.connector.django',
-        'USER': 'ref',
-        'PASSWORD': '$qua$hApp1',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
         'OPTIONS': {
           'autocommit': True,
         },
