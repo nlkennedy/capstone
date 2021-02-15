@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'hand_recognition.wsgi.application'
 DATABASES = {
     'default': {
         'NAME': config('DATABASE'),
-        'ENGINE': 'mysql.connector.django',
+        'ENGINE': 'django.db.backends.mysql',
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),

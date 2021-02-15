@@ -7,5 +7,7 @@ urlpatterns = [
     path('video_feed', views.video_feed, name='video_feed'),
     path('api/teammatches', views.teammatches),
     path('api/games', views.games),
-    path('api/matches', views.matches)
+    path('api/matches', views.matches),
+    path('api/players', views.players),
+    path('api/teams', views.teams)
 ]
