@@ -1,7 +1,19 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
+import axios from 'axios';
 
 class Home extends React.Component {
+    state = {
+        team_matches: []
+      }
+    
+      componentDidMount() {
+        axios.get(`http://localhost:8000/api/teammatches`)
+          .then(res => {
+            const team_matches = res.data;
+            this.setState({ team_matches });
+          })
+      }
     render() {
         return (
             <div>
@@ -14,6 +26,10 @@ class Home extends React.Component {
                     </div>
                 </div>
 
+
+                <ul>
+                    { this.state.team_matches.map(team_match => <li key={team_match.team_match_id}>{team_match.home_team_id}</li>)}
+                </ul>
                 <footer class="footer">
                     <div class="container h-100 d-flex justify-content-center align-items-center">
                         <a class="nav-link" href="/about">About</a>
