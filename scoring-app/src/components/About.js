@@ -5,7 +5,7 @@ class About extends React.Component {
         return (
             <div>
                 <div id="wrap">
-                    <div id="main" class="container" style={{ marginTop: '5%' }}>
+                    <div id="main" className="container" style={{ marginTop: '5%' }}>
                         <h1> About </h1>
                         <p>
                             This app is an auto referee hand signal detection and score keep app for the Tufts University Squash team.
@@ -24,8 +24,8 @@ class About extends React.Component {
                     </div>
                 </div>
 
-                <footer class="footer">
-                        <a class="nav-link" href="/">Back to Home</a>
+                <footer className="footer">
+                        <a className="nav-link" href="/">Back to Home</a>
                 </footer>
             </div>
         )
