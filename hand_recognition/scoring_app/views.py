@@ -136,9 +136,11 @@ def matches_summary(request):
                     "pk": match.pk,
                     "home_player_name": match.home_player_id.first_name + ' ' + match.home_player_id.last_name,
                     "away_player_name": match.away_player_id.first_name + ' ' + match.away_player_id.last_name,
+                    "home_player_score": match.home_player_score,
+                    "away_player_score": match.away_player_score,
                     "match_rank": match.match_rank,
                     "court_number": match.court_number,
-                    "done": teammatch.done
+                    "done": match.done
                 }
                 match_summary.append(entry)
 
