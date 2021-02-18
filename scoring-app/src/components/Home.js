@@ -18,22 +18,19 @@ class Home extends React.Component {
         return (
             <div>
                 <div id="wrap">
-                    <div id="main" class="container clear-top" style={{ marginTop: '5%' }} >
-                        <div class="justify-content-center">
-                            <a class="btn-custom btn btn-secondary btn-lg" href="/create-matchup" role="button">New Team Matchup</a>
+                    <div id="main" className="container clear-top" style={{ marginTop: '5%' }} >
+                        <div className="justify-content-center">
+                            <a className="btn-custom btn btn-secondary btn-lg" href="/create-matchup" role="button">New Team Matchup</a>
                         </div>
 
                         <div>
                             <h4 style={{ marginTop: '5%' }}>Incomplete Team Matchups</h4>
-                            <div class="btn-toolbar justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
+                            <div className="btn-toolbar justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
                                 { this.state.team_matches.map(team_match => 
                                     !team_match.done &&
-                                    <div >
-                                        <a class="btn-custom btn btn-secondary btn-lg mr-2" href={"/matchup/" + team_match.pk} role="button">
+                                    <div key={"teammatch-" + team_match.pk}>
+                                        <a className="btn-custom btn btn-secondary btn-lg mr-2" href={"/matchup/" + team_match.pk} role="button">
                                             {team_match.home_team_name} vs. {team_match.away_team_name} <br /> {team_match.date_played}
-                                            {team_match.done &&  
-                                                <span>done</span>
-                                            }
                                         </a>
                                     </div>
                                 )}
@@ -42,11 +39,11 @@ class Home extends React.Component {
 
                         <div>
                             <h4 style={{ marginTop: '5%' }}>Completed Team Matchups</h4>
-                            <div class="btn-toolbar justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
+                            <div className="btn-toolbar justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
                                 { this.state.team_matches.map(team_match => 
                                     team_match.done &&
-                                    <div >
-                                        <a class="btn-custom btn btn-secondary btn-lg mr-2" href={"/matchup/" + team_match.pk} role="button">
+                                    <div key={"teammatch-" + team_match.pk}>
+                                        <a className="btn-custom btn btn-secondary btn-lg mr-2" href={"/matchup/" + team_match.pk} role="button">
                                             {team_match.home_team_name} vs. {team_match.away_team_name} <br /> {team_match.date_played}                                        
                                         </a>
                                     </div>
@@ -57,8 +54,8 @@ class Home extends React.Component {
                     </div>
                 </div>
 
-                <footer class="footer">
-                    <a class="nav-link" href="/about">About</a>
+                <footer className="footer">
+                    <a className="nav-link" href="/about">About</a>
                 </footer>
             </div>
         )

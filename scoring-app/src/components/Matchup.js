@@ -45,40 +45,40 @@ class Matchup extends React.Component {
 
     render() {
         return (
-            <div class="container">
+            <div className="container">
                 <h1 style={{ marginTop: '5%' }} >Matchup</h1>
                 <h2 style={{ marginBottom: '5%' }}>{ this.state.info.home_team_name } vs { this.state.info.away_team_name } </h2>
 
-                <table class="table table-bordered">
+                <table className="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="w-5 matchup-header" scope="col">#</th>
-                            <th class="w-25 team1-winner" scope="col">{ this.state.info.home_team_name }</th>
-                            <th class="w-40 matchup-header" scope="col">Game</th>
-                            <th class="w-25 team2-winner" scope="col">{ this.state.info.away_team_name }</th>
-                            <th class="w-5 matchup-header" scope="col">Court</th>
+                            <th className="w-5 matchup-header" scope="col">#</th>
+                            <th className="w-25 team1-winner" scope="col">{ this.state.info.home_team_name }</th>
+                            <th className="w-40 matchup-header" scope="col">Game</th>
+                            <th className="w-25 team2-winner" scope="col">{ this.state.info.away_team_name }</th>
+                            <th className="w-5 matchup-header" scope="col">Court</th>
                         </tr>
                     </thead>
                     <tbody>
                         { this.state.matches.map(match => 
-                            <tr>
+                            <tr key={"match-" + match.pk}>
                                 <th scope="row"> {match.match_rank} </th>
-                                <td class={match.done && (match.home_player_score > match.away_player_score) ? "team1-winner" : ""}> {match.home_player_name} </td>
+                                <td className={match.done && (match.home_player_score > match.away_player_score) ? "team1-winner" : ""}> {match.home_player_name} </td>
                                 <td>
                                     { match.games.length > 0 && 
-                                        <table class="table table-sm table-bordered table-game-sum table-fixed">
+                                        <table className="table table-sm table-bordered table-game-sum table-fixed">
                                             <tbody>
                                                 <tr>
                                                     { match.games.map(game => 
-                                                        <td class={game.done && (game.home_player_score > game.away_player_score) ? "team1-winner" : ""} width="20%">{game.home_player_score}</td>
+                                                        <td key={"game-" + game.pk} className={game.done && (game.home_player_score > game.away_player_score) ? "team1-winner" : ""} width="20%">{game.home_player_score}</td>
                                                     )}
-                                                    { [...Array(5 - match.games.length)].map((e, i) => <td width="20%"></td>) }
+                                                    { [...Array(5 - match.games.length)].map((e, i) => <td key={"game-filler-home-" + match.pk + "-" + i} width="20%"></td>) }
                                                 </tr>
                                                 <tr>
                                                     { match.games.map(game => 
-                                                        <td class={game.done && (game.home_player_score < game.away_player_score) ? "team2-winner" : ""} width="20%">{game.away_player_score}</td>
+                                                        <td key={"game-" + game.pk} className={game.done && (game.home_player_score < game.away_player_score) ? "team2-winner" : ""} width="20%">{game.away_player_score}</td>
                                                     )}
-                                                    { [...Array(5 - match.games.length)].map((e, i) => <td width="20%"></td>) }
+                                                    { [...Array(5 - match.games.length)].map((e, i) => <td key={"game-filler-away-" + match.pk + "-" + i} width="20%"></td>) }
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -90,7 +90,7 @@ class Matchup extends React.Component {
                                         <a href="/game/:game_id/scoring">CONTINUE MATCH</a>
                                     }
                                 </td>
-                                <td class={match.done && (match.home_player_score < match.away_player_score) ? "team2-winner" : ""}> {match.away_player_name} </td>
+                                <td className={match.done && (match.home_player_score < match.away_player_score) ? "team2-winner" : ""}> {match.away_player_name} </td>
                                 <td> {match.court_number} </td>
                             </tr>
                         )}
