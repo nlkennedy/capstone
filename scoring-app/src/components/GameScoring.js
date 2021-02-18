@@ -1,6 +1,5 @@
 import React from 'react';
-import {Link} from 'react-router';
-import profile from '../images/person.jpg';
+// import profile from '../images/person.jpg';
 import plus from '../images/plus.png';
 
 class GameScoring extends React.Component {

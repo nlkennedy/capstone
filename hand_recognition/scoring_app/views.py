@@ -79,11 +79,31 @@ def teammatches(request):
         return HttpResponse(status=201)
 
 @csrf_exempt
+def teammatches_summary(request):
+    if request.method == 'GET':
+        try:
+            teammatches = TeamMatches.objects.all()
+            summary = []
+            for teammatch in teammatches:             
+                entry = {
+                    "pk": teammatch.pk,
+                    "home_team_name": teammatch.home_team_id.team_name,
+                    "away_team_name": teammatch.away_team_id.team_name,
+                    "date_played": str(teammatch.date_played),
+                    "done": teammatch.done
+                }
+                summary.append(entry)
+
+            data = json.dumps(summary)
+            return HttpResponse(data, content_type='application/json')
+        except:
+            return HttpResponse(status=500)
+
+@csrf_exempt
 def matches(request):
     if request.method == 'GET':
-        body = request.body.decode('utf-8')
-        json_body = json.loads(body)
-        queryset = Matches.objects.all().filter(team_match_id=json_body['team_match_id'])
+        team_match_id = request.GET['team_match_id']
+        queryset = Matches.objects.all().filter(team_match_id=team_match_id)
         data = serializers.serialize('json', queryset)
         return HttpResponse(data, content_type='application/json')
     elif request.method == 'POST':
@@ -100,6 +120,37 @@ def matches(request):
         except:
             return HttpResponse(status=500)
         return HttpResponse(status=201)
+
+
+@csrf_exempt
+def matches_summary(request):
+    if request.method == 'GET':
+        try:
+            team_match_id = request.GET['team_match_id']
+            teammatch = TeamMatches.objects.get(pk=team_match_id)
+            matches = Matches.objects.all().filter(team_match_id=team_match_id)
+            match_summary = []
+
+            for match in matches: 
+                entry = {
+                    "pk": match.pk,
+                    "home_player_name": match.home_player_id.first_name + ' ' + match.home_player_id.last_name,
+                    "away_player_name": match.away_player_id.first_name + ' ' + match.away_player_id.last_name,
+                    "match_rank": match.match_rank,
+                    "court_number": match.court_number,
+                    "done": teammatch.done
+                }
+                match_summary.append(entry)
+
+            data = json.dumps({
+                "home_team_name": teammatch.home_team_id.team_name,
+                "away_team_name": teammatch.away_team_id.team_name,
+                "matches": match_summary
+            })
+
+            return HttpResponse(data, content_type='application/json')
+        except:
+            return HttpResponse(status=500)
 
 @csrf_exempt
 def games(request):
@@ -122,7 +173,36 @@ def games(request):
         return HttpResponse(status=201)    
     elif request.method == 'PUT':
         return HttpResponse(status=201)
-    '''
+
+
+@csrf_exempt
+def games_summary(request):
+    if request.method == 'GET':
+        match_id = request.GET['match_id']
+        games = Games.objects.all().filter(match_id=match_id)
+        games_summary = []
+
+        for game in games: 
+            entry = {
+                "pk": game.pk,
+                "home_player_score": game.home_player_score,
+                "away_player_score": game.away_player_score,
+                "game_number": game.game_number,
+                "done": game.done
+            }
+            games_summary.append(entry)
+
+        
+        print(games_summary)
+        data = json.dumps(games_summary)
+
+        return HttpResponse(data, content_type='application/json')
+
+
+
+
+
+'''
 
 
 
