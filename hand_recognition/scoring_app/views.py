@@ -53,8 +53,7 @@ def players(request):
             json_body = json.loads(body)
             Players.objects.create(
                 team_id=Teams.objects.get(pk=json_body['team_id']),
-                first_name=json_body['first_name'],
-                last_name=json_body['last_name']
+                name=json_body['name']
             )
         except:
             return HttpResponse(status=500)
@@ -162,8 +161,8 @@ def matches_summary(request):
             for match in matches: 
                 entry = {
                     "pk": match.pk,
-                    "home_player_name": match.home_player_id.first_name + ' ' + match.home_player_id.last_name,
-                    "away_player_name": match.away_player_id.first_name + ' ' + match.away_player_id.last_name,
+                    "home_player_name": match.home_player_id.name,
+                    "away_player_name": match.away_player_id.name,
                     "home_player_score": match.home_player_score,
                     "away_player_score": match.away_player_score,
                     "match_rank": match.match_rank,

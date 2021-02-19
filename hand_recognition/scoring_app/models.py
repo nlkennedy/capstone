@@ -9,8 +9,7 @@ class Teams(models.Model):
 class Players(models.Model):
     player_id = models.AutoField(primary_key=True)
     team_id = models.ForeignKey(Teams, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
 
 class TeamMatches(models.Model):
     team_match_id = models.AutoField(primary_key=True)

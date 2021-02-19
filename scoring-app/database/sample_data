@@ -11,17 +11,17 @@ INSERT INTO Teams (team_name)
 VALUES ('Bowdoin');
 
 -- Players
-INSERT INTO Players (team_id, first_name, last_name)
-VALUES (1, 'Radhika', 'Joshi');
+INSERT INTO Players (team_id, name)
+VALUES (1, 'Radhika Joshi');
 
-INSERT INTO Players (team_id, first_name, last_name)
-VALUES (1, 'Nicole', 'Kennedy');
+INSERT INTO Players (team_id, name)
+VALUES (1, 'Nicole Kennedy');
 
-INSERT INTO Players (team_id, first_name, last_name)
-VALUES (2, 'Ben', 'Bodine');
+INSERT INTO Players (team_id, name)
+VALUES (2, 'Ben Bodine');
 
-INSERT INTO Players (team_id, first_name, last_name)
-VALUES (2, 'Harsh', 'Prajapati');
+INSERT INTO Players (team_id, name)
+VALUES (2, 'Harsh Prajapati');
 
 -- TeamMatches
 INSERT INTO TeamMatches (home_team_id, away_team_id, date_played)
