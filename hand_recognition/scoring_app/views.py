@@ -79,6 +79,34 @@ def teammatches(request):
         return HttpResponse(status=201)
 
 @csrf_exempt
+def teammatches_all(request):
+    if request.method == 'POST':
+        # try:
+        body = request.body.decode('utf-8')
+        json_body = json.loads(body)
+        print(json_body)
+
+        # create teams
+
+        # create players
+        # REMOVE FIRST/LASTNAME
+
+        # create teammatch
+
+        # create matches
+        # TeamMatches.objects.create(
+        #     home_team_id=Teams.objects.get(pk=json_body['home_team_id']),
+        #     away_team_id=Teams.objects.get(pk=json_body['away_team_id']),
+        # )
+
+
+        return HttpResponse(status=201)
+        # except:
+        #     return HttpResponse(status=500)
+    else: 
+        return HttpResponse(status=404)
+
+@csrf_exempt
 def teammatches_summary(request):
     if request.method == 'GET':
         try:

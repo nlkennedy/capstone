@@ -44,6 +44,7 @@ class Matchup extends React.Component {
     }
 
     render() {
+        const match_length = 5;
         return (
             <div className="container">
                 <h1 style={{ marginTop: '5%' }} >Matchup</h1>
@@ -72,13 +73,13 @@ class Matchup extends React.Component {
                                                     { match.games.map(game => 
                                                         <td key={"game-" + game.pk} className={game.done && (game.home_player_score > game.away_player_score) ? "team1-winner" : ""} width="20%">{game.home_player_score}</td>
                                                     )}
-                                                    { [...Array(5 - match.games.length)].map((e, i) => <td key={"game-filler-home-" + match.pk + "-" + i} width="20%"></td>) }
+                                                    { [...Array(match_length - match.games.length)].map((e, i) => <td key={"game-filler-home-" + match.pk + "-" + i} width="20%"></td>) }
                                                 </tr>
                                                 <tr>
                                                     { match.games.map(game => 
                                                         <td key={"game-" + game.pk} className={game.done && (game.home_player_score < game.away_player_score) ? "team2-winner" : ""} width="20%">{game.away_player_score}</td>
                                                     )}
-                                                    { [...Array(5 - match.games.length)].map((e, i) => <td key={"game-filler-away-" + match.pk + "-" + i} width="20%"></td>) }
+                                                    { [...Array(match_length - match.games.length)].map((e, i) => <td key={"game-filler-away-" + match.pk + "-" + i} width="20%"></td>) }
                                                 </tr>
                                             </tbody>
                                         </table>

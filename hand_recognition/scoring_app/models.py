@@ -6,7 +6,6 @@ class Teams(models.Model):
     team_id = models.AutoField(primary_key=True)
     team_name = models.CharField(max_length=255)
 
-
 class Players(models.Model):
     player_id = models.AutoField(primary_key=True)
     team_id = models.ForeignKey(Teams, on_delete=models.CASCADE)
@@ -38,4 +37,3 @@ class Games(models.Model):
     away_player_score = models.IntegerField(default=0)
     game_number = models.IntegerField()
     done = models.BooleanField(default=False)
-

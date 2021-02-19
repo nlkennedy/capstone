@@ -1,8 +1,21 @@
 import React from 'react';
 // import profile from '../images/person.jpg';
 import plus from '../images/plus.png';
+import axios from 'axios';
 
 class GameScoring extends React.Component {
+    state = {
+        game: {}
+    }
+
+    componentDidMount() {
+        axios.get(`http://localhost:8000/api/game`)
+        .then(res => {
+            const game = res.data;
+            this.setState({ game });
+        })
+    }
+
     render() {
         return (
             <div className="container" style={{ marginBottom: '5%'}}>
