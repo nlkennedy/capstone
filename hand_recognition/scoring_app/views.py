@@ -107,6 +107,9 @@ def teammatches_all(request):
                     match_rank=match['match_rank'],
                     court_number=match['court_number']
                 )
+
+            data = json.dumps({"team_match_id": team_match.pk})
+            return HttpResponse(data, content_type='application/json')
         except:
             return HttpResponse(status=500)
     return HttpResponse(status=201)
@@ -198,17 +201,18 @@ def games(request):
     elif request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
-            json_body = json.loads(body)
-            Games.objects.create(
-                match_id=Matches.objects.get(pk=json_body['match_id']),
-                game_number=json_body['game_number']
+            data = json.loads(body)
+
+            game = Games.objects.create(
+                match_id=Matches.objects.get(pk=data['match_id']),
+                game_number=data['game_number']
             )
+
+            response_data = json.dumps({'game_id': game.pk})
+            return HttpResponse(response_data, content_type='application/json')
         except:
             return HttpResponse(status=500)
-        return HttpResponse(status=201)    
-    elif request.method == 'PUT':
-        return HttpResponse(status=201)
-
+    return HttpResponse(status=201)
 
 @csrf_exempt
 def games_summary(request):
@@ -227,10 +231,7 @@ def games_summary(request):
             }
             games_summary.append(entry)
 
-        
-        print(games_summary)
         data = json.dumps(games_summary)
-
         return HttpResponse(data, content_type='application/json')
 
 

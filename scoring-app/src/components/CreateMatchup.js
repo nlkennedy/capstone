@@ -65,8 +65,9 @@ class CreateMatchup extends React.Component {
         }
 
         axios.post(`http://localhost:8000/api/teammatches-all`, data)
-            .then((response) => {
-                console.log(response);
+            .then((res) => {
+                const team_match_id = res.data.team_match_id
+                this.props.history.push('/matchup/' + team_match_id)
             }, (error) => {
                 console.log(error);
             });

@@ -2,9 +2,15 @@ import React from 'react';
 import axios from 'axios';
 
 class Matchup extends React.Component {
-    state = {
-        info: {},
-        matches: []
+    constructor(props) {
+        super(props);
+        this.state = {
+            info: {},
+            matches: []
+        };
+    
+        this.handleBeginMatch = this.handleBeginMatch.bind(this);
+        this.handleContinueMatch = this.handleContinueMatch.bind(this);
     }
 
     async componentDidMount() {
@@ -41,6 +47,29 @@ class Matchup extends React.Component {
             });
 
         }));
+    }
+
+    // Link to a game that doesn't exist
+    handleBeginMatch(match_id, game_number, e) {
+        e.preventDefault();
+        const data = {
+            'match_id': match_id,
+            'game_number': game_number
+        }
+
+        axios.post(`http://localhost:8000/api/games`, data)
+            .then((res) => {
+                const game_id = res.data.game_id
+                this.props.history.push('/game/' + game_id + "/scoring")
+            }, (error) => {
+                console.log(error);
+            });
+    }
+
+    // Link to a game that already exists
+    handleContinueMatch(game_id, e) {
+        e.preventDefault();
+        this.props.history.push('/game/' + game_id + "/scoring")
     }
 
     render() {
@@ -84,11 +113,12 @@ class Matchup extends React.Component {
                                             </tbody>
                                         </table>
                                     }
-                                    { !match.done && match.games.length === 0 && 
-                                        <a href="/game/:game_id/scoring">BEGIN MATCH</a>
+                                    {/* wrong */}
+                                    { !match.done && (match.games.length === 0 || match.games[match.games.length - 1].done) && 
+                                        <button type="button" className="btn btn-outline-secondary m-2" onClick={(e) => this.handleBeginMatch(match.pk, match.games.length === 0 ? 1 : match.games.length + 1, e)}>BEGIN MATCH</button>
                                     }
-                                    { !match.done && match.games.length > 0 && 
-                                        <a href="/game/:game_id/scoring">CONTINUE MATCH</a>
+                                    { !match.done && match.games.length > 0 && !match.games[match.games.length - 1].done && 
+                                        <button type="button" className="btn btn-outline-secondary m-2" onClick={(e) => this.handleContinueMatch(match.games[match.games.length - 1].pk, e)}>CONTINUE MATCH</button>
                                     }
                                 </td>
                                 <td className={match.done && (match.home_player_score < match.away_player_score) ? "team2-winner" : ""}> {match.away_player_name} </td>
