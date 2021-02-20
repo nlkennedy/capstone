@@ -5,11 +5,12 @@ class CreateMatchup extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            teamA: "",
-            teamB: "",
-            playersA: Array(9).fill(""),
-            playersB: Array(9).fill(""),
-            courts: Array(9).fill("")
+            // change default to "" when finished testing 
+            homeTeam: "Tufts",
+            awayTeam: "Colby",
+            homePlayers: Array(9).fill("a"),
+            awayPlayers: Array(9).fill("b"),
+            courts: Array(9).fill("2")
         };
     
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -17,8 +18,6 @@ class CreateMatchup extends React.Component {
     }
 
     handleTitleInputChange(event) {
-        console.log("handle title input change")
-        console.log(event)
         const target = event.target;
         const value = target.value;
         const name = target.name;
@@ -43,13 +42,36 @@ class CreateMatchup extends React.Component {
         });
     }
 
-    // READY TO DO THIS
     handleSubmit = event => {
         event.preventDefault();
-        for(var i = 0; i < event.target.length; i++) {
-            console.log(event.target[i].value)
+
+        // add type checking and make sure all fields are filled 
+
+        var matches = [];
+        for (var i = 0; i < 9; i++) {
+            const match = {
+                'home_player': this.state.homePlayers[i],
+                'away_player': this.state.awayPlayers[i],
+                'court': this.state.courts[i],
+                'match_rank': i + 1,
+            }
+            matches.push(match);
         }
-        console.log(event.target[0].value)
+
+        var data = {
+            'home_team_name': this.state.homeTeam,
+            'away_team_name': this.state.awayTeam,
+            'matches': matches
+        }
+
+        console.log("data")
+        console.log(data)
+
+
+        // for(var i = 0; i < event.target.length; i++) {
+        //     console.log(event.target[i].value)
+        // }
+        // console.log(event.target[0].value)
 
         // axios.post(`http://localhost:8000/api/teammatches-all`, { })
         //   .then(res => {
@@ -73,22 +95,22 @@ class CreateMatchup extends React.Component {
                         <div className="col-sm-4">                            
                             <div className="form-group">
                                 <input 
-                                    name="teamA"
+                                    name="homeTeam"
                                     type="text" 
                                     className="form-control" 
-                                    placeholder="Team A"
-                                    value={this.state.teamA}
+                                    placeholder="Home Team"
+                                    value={this.state.homeTeam}
                                     onChange={this.handleTitleInputChange} />
                             </div>
                         </div>
                         <div className="col-sm-4">
                             <div className="form-group">
                                 <input 
-                                    name="teamB"
+                                    name="awayTeam"
                                     type="text" 
                                     className="form-control" 
-                                    placeholder="Team B"
-                                    value={this.state.teamB}
+                                    placeholder="Away Team"
+                                    value={this.state.awayTeam}
                                     onChange={this.handleTitleInputChange} />
                             </div>
                         </div>
@@ -104,20 +126,20 @@ class CreateMatchup extends React.Component {
                             </div>
                             <div className="col-sm-4 form-group">
                                 <input 
-                                    name={"playersA/" + i}
+                                    name={"homePlayers/" + i}
                                     type="text" 
                                     className="form-control" 
-                                    placeholder={"Player " + (i + 1) + "A"}
-                                    value={this.state.playersA[i]}
+                                    placeholder={"Home Player " + (i + 1)}
+                                    value={this.state.homePlayers[i]}
                                     onChange={this.handleInputChange} />
                             </div>
                             <div className="col-sm-4 form-group">
                                 <input 
-                                    name={"playersB/" + i}
+                                    name={"awayPlayers/" + i}
                                     type="text" 
                                     className="form-control" 
-                                    placeholder={"Player " + (i + 1) + "B"}
-                                    value={this.state.playersB[i]}
+                                    placeholder={"Away Player " + (i + 1)}
+                                    value={this.state.awayPlayers[i]}
                                     onChange={this.handleInputChange} />
                             </div>
                             <div className="col-sm-3 form-group">
