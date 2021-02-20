@@ -9,7 +9,7 @@ class Home extends React.Component {
     componentDidMount() {
         axios.get(`http://localhost:8000/api/teammatches-summary`)
         .then(res => {
-            const team_matches = res.data;
+            const team_matches = res.data.reverse();
             this.setState({ team_matches });
         })
     }

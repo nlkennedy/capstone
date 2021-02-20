@@ -80,30 +80,36 @@ def teammatches(request):
 @csrf_exempt
 def teammatches_all(request):
     if request.method == 'POST':
-        # try:
-        body = request.body.decode('utf-8')
-        json_body = json.loads(body)
-        print(json_body)
+        try:
+            body = request.body.decode('utf-8')
+            data = json.loads(body)
 
-        # create teams
+            # create teams
+            home_team = Teams.objects.create(team_name=data['home_team_name'])
+            away_team = Teams.objects.create(team_name=data['away_team_name'])
 
-        # create players
-        # REMOVE FIRST/LASTNAME
+            # create teammatch
+            team_match = TeamMatches.objects.create(
+                home_team_id=home_team,
+                away_team_id=away_team,
+            )
 
-        # create teammatch
+            for match in data['matches']: 
+                # create players
+                home_player = Players.objects.create(team_id=home_team, name=match['home_player'])
+                away_player = Players.objects.create(team_id=away_team, name=match['away_player'])
 
-        # create matches
-        # TeamMatches.objects.create(
-        #     home_team_id=Teams.objects.get(pk=json_body['home_team_id']),
-        #     away_team_id=Teams.objects.get(pk=json_body['away_team_id']),
-        # )
-
-
-        return HttpResponse(status=201)
-        # except:
-        #     return HttpResponse(status=500)
-    else: 
-        return HttpResponse(status=404)
+                # create match
+                Matches.objects.create(
+                    team_match_id=team_match,
+                    home_player_id=home_player,
+                    away_player_id=away_player,
+                    match_rank=match['match_rank'],
+                    court_number=match['court_number']
+                )
+        except:
+            return HttpResponse(status=500)
+    return HttpResponse(status=201)
 
 @csrf_exempt
 def teammatches_summary(request):

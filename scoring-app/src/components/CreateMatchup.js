@@ -6,11 +6,11 @@ class CreateMatchup extends React.Component {
         super(props);
         this.state = {
             // change default to "" when finished testing 
-            homeTeam: "Tufts",
-            awayTeam: "Colby",
-            homePlayers: Array(9).fill("a"),
-            awayPlayers: Array(9).fill("b"),
-            courts: Array(9).fill("2")
+            homeTeam: "Home Team Name",
+            awayTeam: "Away Team Name",
+            homePlayers: ["homeA", "homeB", "homeC", "homeD", "homeE", "homeF", "homeG", "homeH", "homeI"], //Array(9).fill(""),
+            awayPlayers: ["awayA", "awayB", "awayC", "awayD", "awayE", "awayF", "awayG", "awayH", "awayI"], //Array(9).fill(""),
+            courts: [1, 2, 3, 4, 5, 6, 7, 8, 9] // Array(9).fill("")
         };
     
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -44,15 +44,15 @@ class CreateMatchup extends React.Component {
 
     handleSubmit = event => {
         event.preventDefault();
-
         // add type checking and make sure all fields are filled 
 
+        // condense data 
         var matches = [];
         for (var i = 0; i < 9; i++) {
             const match = {
                 'home_player': this.state.homePlayers[i],
                 'away_player': this.state.awayPlayers[i],
-                'court': this.state.courts[i],
+                'court_number': this.state.courts[i],
                 'match_rank': i + 1,
             }
             matches.push(match);
@@ -64,20 +64,12 @@ class CreateMatchup extends React.Component {
             'matches': matches
         }
 
-        console.log("data")
-        console.log(data)
-
-
-        // for(var i = 0; i < event.target.length; i++) {
-        //     console.log(event.target[i].value)
-        // }
-        // console.log(event.target[0].value)
-
-        // axios.post(`http://localhost:8000/api/teammatches-all`, { })
-        //   .then(res => {
-        //     console.log(res);
-        //     console.log(res.data);
-        //   })
+        axios.post(`http://localhost:8000/api/teammatches-all`, data)
+            .then((response) => {
+                console.log(response);
+            }, (error) => {
+                console.log(error);
+            });
       }
 
     render() {
