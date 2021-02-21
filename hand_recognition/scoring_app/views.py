@@ -193,11 +193,33 @@ def matches_summary(request):
 @csrf_exempt
 def games(request):
     if request.method == 'GET':
-        body = request.body.decode('utf-8')
-        json_body = json.loads(body)
-        queryset = Games.objects.all().filter(match_id=json_body['match_id'])
-        data = serializers.serialize('json', queryset)
-        return HttpResponse(data, content_type='application/json')
+        game_id = request.GET['game_id']
+        game = Games.objects.get(pk=game_id)
+
+        game_data = {
+            'game_id': game.game_id,
+            'match_id': game.match_id.pk,
+            'home_player_score': game.home_player_score,
+            'away_player_score': game.away_player_score,
+            'game_number': game.game_number,
+            'done': game.done
+        }
+
+        match_data = {
+            'team_match_id': game.match_id.team_match_id.pk,
+            'home_team_name': game.match_id.home_player_id.team_id.team_name,
+            'away_team_name': game.match_id.away_player_id.team_id.team_name,
+            'home_player_name': game.match_id.home_player_id.name,
+            'away_player_name': game.match_id.away_player_id.name
+        }
+
+        data = {
+            'game_data': game_data,
+            'match_data': match_data
+        }
+
+        response_data = json.dumps(data)
+        return HttpResponse(response_data, content_type='application/json')
     elif request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
