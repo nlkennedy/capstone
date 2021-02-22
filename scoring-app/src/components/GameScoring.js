@@ -10,6 +10,8 @@ class GameScoring extends React.Component {
             game: {},
             match: {}
         };
+    
+        this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
     }
 
     componentDidMount() {
@@ -25,6 +27,29 @@ class GameScoring extends React.Component {
                 game: data.game_data, 
                 match: data.match_data
             });
+        });
+    }
+
+    handleScorePlusOne(team, e) {
+        e.preventDefault();
+
+        // update state
+        const game = this.state.game;
+        const win_by_two = Math.abs(game.home_player_score - game.away_player_score) < 2;
+        if (game[team] < 11 || win_by_two) {
+            game[team] += 1;
+            this.setState({
+                game: game, 
+            });
+        }
+
+        // update database
+        axios.patch(`http://localhost:8000/api/games`, this.state.game)
+        .then((res) => {
+            const result = res.data;
+            console.log(result)
+        }, (error) => {
+            console.log(error);
         });
     }
 
@@ -75,9 +100,9 @@ class GameScoring extends React.Component {
                                 <div className="col-4">
                                     <div className="row">
                                         <div className="col-12">
-                                            <div className="shaded-gray">
+                                            <button className="shaded-gray" onClick={(e) => this.handleScorePlusOne("home_player_score", e)}>
                                                 <img src={plus} className="img-fluid w-75" alt="" />
-                                            </div>
+                                            </button>
                                         </div>
                                     </div>
                                     <div className="row">
@@ -124,9 +149,9 @@ class GameScoring extends React.Component {
                                 <div className="col-4">
                                     <div className="row">
                                         <div className="col-12">
-                                            <div className="shaded-gray">
+                                            <button className="shaded-gray" onClick={(e) => this.handleScorePlusOne("away_player_score", e)}>
                                                 <img src={plus} className="img-fluid w-75" alt="" />
-                                            </div>
+                                            </button>
                                         </div>
                                     </div>
                                     <div className="row">

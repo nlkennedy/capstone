@@ -234,6 +234,21 @@ def games(request):
             return HttpResponse(response_data, content_type='application/json')
         except:
             return HttpResponse(status=500)
+    elif request.method == 'PATCH':
+        try:
+            body = request.body.decode('utf-8')
+            data = json.loads(body)
+            game = Games.objects.get(pk=data['game_id'])
+
+            game.home_player_score = data['home_player_score']
+            game.away_player_score = data['away_player_score']
+            game.done = data['done']
+            game.save()
+
+            response_data = json.dumps({'game_id': game.pk})
+            return HttpResponse(response_data, content_type='application/json')
+        except:
+            return HttpResponse(status=500)
     return HttpResponse(status=201)
 
 @csrf_exempt
