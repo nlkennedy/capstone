@@ -20,6 +20,7 @@ class GameScoring extends React.Component {
         this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
         this.handleBeginNextGame = this.handleBeginNextGame.bind(this);
         this.handleServeChange = this.handleServeChange.bind(this);
+        this.handleRefereeCall = this.handleRefereeCall.bind(this);
     }
 
     componentDidMount() {
@@ -159,6 +160,11 @@ class GameScoring extends React.Component {
         this.updateServeButtons(e.target.id)
     }
 
+    handleRefereeCall(team, e) {
+        // TODO
+        console.log("The " + team + " team requests a referee call");
+    }
+
     render() {
         return (
             <div>
@@ -247,13 +253,13 @@ class GameScoring extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col-4">
-                                    <h5 className="shaded-orange">Referee Call</h5>
+                                    <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("home", e)}>Referee Call</h5>
                                 </div>
                                 <div className="col-4">
                                     <h5 className="shaded-red game-button">Undo</h5>
                                 </div>
                                 <div className="col-4">
-                                    <h5 className="shaded-orange">Referee Call</h5>
+                                    <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("away", e)}>Referee Call</h5>
                                 </div>
                             </div>
                             <div className="row">
