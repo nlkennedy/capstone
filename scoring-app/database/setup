@@ -10,8 +10,7 @@ CREATE TABLE Teams (
 CREATE TABLE Players (
     player_id int NOT NULL AUTO_INCREMENT, 
     team_id int NOT NULL, 
-    first_name varchar(255) NOT NULL, 
-    last_name varchar(255) NOT NULL, 
+    name varchar(255) NOT NULL, 
     PRIMARY KEY (player_id),
     FOREIGN KEY (team_id) REFERENCES Teams(team_id)
 );

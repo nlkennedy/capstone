@@ -6,12 +6,10 @@ class Teams(models.Model):
     team_id = models.AutoField(primary_key=True)
     team_name = models.CharField(max_length=255)
 
-
 class Players(models.Model):
     player_id = models.AutoField(primary_key=True)
     team_id = models.ForeignKey(Teams, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
 
 class TeamMatches(models.Model):
     team_match_id = models.AutoField(primary_key=True)
@@ -38,4 +36,3 @@ class Games(models.Model):
     away_player_score = models.IntegerField(default=0)
     game_number = models.IntegerField()
     done = models.BooleanField(default=False)
-
