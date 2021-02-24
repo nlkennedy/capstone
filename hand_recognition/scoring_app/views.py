@@ -6,7 +6,10 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+import re 
 from functools import reduce
+
+specialChars = re.compile('[@_!#$%^&*()<>?/\|}{~:=]')
 
 def index(request):
     return render(request, 'scoring_app/home.html')
@@ -33,6 +36,10 @@ def teams(request):
         try:
             body = request.body.decode('utf-8')
             json_body = json.loads(body)
+            #Verify Name
+            if (specialChars.search(json_body['team_name']) != None):
+                return HttpResponse(status=400)
+
             Teams.objects.create(team_name=json_body['team_name'])
         except:
             return HttpResponse(status=500)
@@ -43,6 +50,10 @@ def players(request):
     if request.method == 'GET':
         body = request.body.decode('utf-8')
         json_body = json.loads(body)
+        #Verify Id
+        if not isinstance(json_body['team_id'], int):
+            return HttpResponse(status=400)
+
         queryset = Players.objects.all().filter(team_id=json_body['team_id'])
         data = serializers.serialize('json', queryset)
         return HttpResponse(data, content_type='application/json')
@@ -50,6 +61,14 @@ def players(request):
         try:
             body = request.body.decode('utf-8')
             json_body = json.loads(body)
+
+            #Verify Data
+            if not isinstance(json_body['team_id'], int):
+                return HttpResponse(status=400)
+
+            if (specialChars.search(json_body['name']) != None):
+                return HttpResponse(status=400)
+
             Players.objects.create(
                 team_id=Teams.objects.get(pk=json_body['team_id']),
                 name=json_body['name']
@@ -68,6 +87,11 @@ def teammatches(request):
         try:
             body = request.body.decode('utf-8')
             json_body = json.loads(body)
+
+            #Verify ids
+            if (not isinstance(json_body['home_team_id'], int)) or (not isinstance(json_body['away_team_id'], int)):
+                return HttpResponse(status=400)
+
             TeamMatches.objects.create(
                 home_team_id=Teams.objects.get(pk=json_body['home_team_id']),
                 away_team_id=Teams.objects.get(pk=json_body['away_team_id']),
@@ -83,6 +107,11 @@ def teammatches_all(request):
             body = request.body.decode('utf-8')
             data = json.loads(body)
 
+            #Make sure there are no special characters in data passed from user
+            if specialChars.search(json_body['home_team_name'] != None):
+                return HttpResponse(status=400)
+            if specialChars.search(json_body['away_team_name'] != None):
+                return HttpResponse(status=400)
             # create teams
             home_team = Teams.objects.create(team_name=data['home_team_name'])
             away_team = Teams.objects.create(team_name=data['away_team_name'])
@@ -94,6 +123,17 @@ def teammatches_all(request):
             )
 
             for match in data['matches']: 
+                # Verify no special characters
+                if (specialChars.search(match['home_player']) != None):
+                    return HttpResponse(status=400)
+                if (specialChars.search(match['away_player']) != None):
+                    return HttpResponse(status=400)
+                #Verify data
+                if (not isinstance(match['match_rank'], int)):
+                    return HttpResponse(status=400)
+                if (not isinstance(match['court_number'], int)):
+                    return HttpResponse(status=400)   
+
                 # create players
                 home_player = Players.objects.create(team_id=home_team, name=match['home_player'])
                 away_player = Players.objects.create(team_id=away_team, name=match['away_player'])
@@ -138,6 +178,11 @@ def teammatches_summary(request):
 def matches(request):
     if request.method == 'GET':
         team_match_id = request.GET['team_match_id']
+
+        #Verify ID  
+        if not isinstance(team_match_id, int):
+            return HttpResponse(status=400)
+
         queryset = Matches.objects.all().filter(team_match_id=team_match_id)
         data = serializers.serialize('json', queryset)
         return HttpResponse(data, content_type='application/json')
@@ -145,6 +190,19 @@ def matches(request):
         try:
             body = request.body.decode('utf-8')
             json_body = json.loads(body)
+            #Verify Ids 
+            if (not isinstance(json_body['team_match_id'], int)):
+                return HttpResponse(status=400)
+            if (not isinstance(json_body['home_player_id'], int)):
+                return HttpResponse(status=400)
+            if (not isinstance(json_body['away_player_id'], int)):
+                return HttpResponse(status=400)
+            #Verify data
+            if (not isinstance(json_body['match_rank'], int)):
+                return HttpResponse(status=400)
+            if (not isinstance(json_body['court_number'], int)):
+                return HttpResponse(status=400)   
+
             Matches.objects.create(
                 team_match_id=TeamMatches.objects.get(pk=json_body['team_match_id']),
                 home_player_id=Players.objects.get(pk=json_body['home_player_id']),
@@ -159,6 +217,10 @@ def matches(request):
         try:
             body = request.body.decode('utf-8')
             data = json.loads(body)
+
+            if (not isinstance(data['match_id'], int)):
+                return HttpResponse(status=400)
+
             match = Matches.objects.get(pk=data['match_id'])
 
             match.home_player_score = data['home_player_score']
@@ -186,6 +248,11 @@ def matches_summary(request):
     if request.method == 'GET':
         try:
             team_match_id = request.GET['team_match_id']
+
+            #Verify ID
+            if not isinstance(team_match_id, int):
+                return HttpResponse(status=400)
+
             teammatch = TeamMatches.objects.get(pk=team_match_id)
             matches = Matches.objects.all().filter(team_match_id=team_match_id)
             match_summary = []
@@ -217,6 +284,11 @@ def matches_summary(request):
 def games(request):
     if request.method == 'GET':
         game_id = request.GET['game_id']
+        
+        #Verify ID
+        if not isinstance(game_id, int):
+            return HttpResponse(status=400)
+
         game = Games.objects.get(pk=game_id)
 
         game_data = {
@@ -251,6 +323,10 @@ def games(request):
             body = request.body.decode('utf-8')
             data = json.loads(body)
 
+            #Verify Id
+            if not isinstance(data['match_id'], int):
+                return HttpResponse(status=400)
+
             game = Games.objects.create(
                 match_id=Matches.objects.get(pk=data['match_id']),
                 game_number=data['game_number']
@@ -264,6 +340,11 @@ def games(request):
         try:
             body = request.body.decode('utf-8')
             data = json.loads(body)
+
+            #Verify Id
+            if not isinstance(data['game_id'], int):
+                return HttpResponse(status=400)
+                
             game = Games.objects.get(pk=data['game_id'])
 
             game.home_player_score = data['home_player_score']
@@ -281,6 +362,11 @@ def games(request):
 def games_summary(request):
     if request.method == 'GET':
         match_id = request.GET['match_id']
+
+        #Verify Id
+        if not isinstance(match_id, int):
+            return HttpResponse(status=400)
+                
         games = Games.objects.all().filter(match_id=match_id)
         games_summary = []
 
