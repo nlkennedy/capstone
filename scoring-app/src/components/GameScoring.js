@@ -220,15 +220,17 @@ class GameScoring extends React.Component {
                                     </div>
                                 </div>
                                 <div className="col-4">
-                                    <div className="container">
-                                        {/* <h5> */}
-                                            { this.state.points.map((point, i) => 
-                                                <div key={"point-" + i} className="row">
-                                                    <div className="col-6 text-right">{point[0]}</div>
-                                                    <div className="col-6 text-left">{point[1]}</div>
-                                                </div>
-                                            )}
-                                        {/* </h5> */}
+                                    <div className="scrollable"> 
+                                        <div className="container">
+                                            <h5>
+                                                { this.state.points.map((point, i) => 
+                                                    <div key={"point-" + i} className="row">
+                                                        <div className="col-6 text-right">{point[0]}</div>
+                                                        <div className="col-6 text-left">{point[1]}</div>
+                                                    </div>
+                                                )}
+                                            </h5>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="col-4">
