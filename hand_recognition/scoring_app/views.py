@@ -6,8 +6,7 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-# Create your views here.
-
+from functools import reduce
 
 def index(request):
     return render(request, 'scoring_app/home.html')
@@ -156,6 +155,30 @@ def matches(request):
         except:
             return HttpResponse(status=500)
         return HttpResponse(status=201)
+    elif request.method == 'PATCH':
+        try:
+            body = request.body.decode('utf-8')
+            data = json.loads(body)
+            match = Matches.objects.get(pk=data['match_id'])
+
+            match.home_player_score = data['home_player_score']
+            match.away_player_score = data['away_player_score']
+            match.done = data['done']
+            match.save()
+
+            # check if teammatch is done and update as necesary 
+            all_matches = Matches.objects.filter(team_match_id=match.team_match_id.pk)
+            team_match_done = reduce(lambda a, b : a & b.done, all_matches, True)
+            if team_match_done:
+                team_match = match.team_match_id
+                team_match.done = team_match_done
+                team_match.save()
+
+            response_data = json.dumps({'match_id': match.pk})
+            return HttpResponse(response_data, content_type='application/json')
+        except: 
+            return HttpResponse(status=500)
+    return HttpResponse(status=201)
 
 
 @csrf_exempt
@@ -198,7 +221,6 @@ def games(request):
 
         game_data = {
             'game_id': game.game_id,
-            'match_id': game.match_id.pk,
             'home_player_score': game.home_player_score,
             'away_player_score': game.away_player_score,
             'game_number': game.game_number,
@@ -207,10 +229,14 @@ def games(request):
 
         match_data = {
             'team_match_id': game.match_id.team_match_id.pk,
+            'match_id': game.match_id.pk,
             'home_team_name': game.match_id.home_player_id.team_id.team_name,
             'away_team_name': game.match_id.away_player_id.team_id.team_name,
             'home_player_name': game.match_id.home_player_id.name,
-            'away_player_name': game.match_id.away_player_id.name
+            'away_player_name': game.match_id.away_player_id.name,
+            'home_player_score': game.match_id.home_player_score,
+            'away_player_score': game.match_id.away_player_score,
+            'done': game.match_id.done
         }
 
         data = {

@@ -25,30 +25,48 @@ class Home extends React.Component {
 
                         <div>
                             <h4 style={{ marginTop: '5%' }}>Incomplete Team Matchups</h4>
-                            <div className="btn-toolbar justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
-                                { this.state.team_matches.map(team_match => 
-                                    !team_match.done &&
-                                    <div key={"teammatch-" + team_match.pk}>
-                                        <a className="btn-custom btn btn-secondary btn-lg mr-2" href={"/matchup/" + team_match.pk} role="button">
-                                            {team_match.home_team_name} vs. {team_match.away_team_name} <br /> {team_match.date_played}
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
+                            <table className="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th className="w-40" scope="col">Home Team</th>
+                                        <th className="w-40" scope="col">Away Team</th>
+                                        <th className="w-20" scope="col">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    { this.state.team_matches.map((team_match, i) => 
+                                        !team_match.done &&
+                                        <tr key={"teammatch-" + team_match.pk} className="hover" onClick={() => window.location="/matchup/" + team_match.pk}>
+                                            <td>{team_match.home_team_name}</td>
+                                            <td>{team_match.away_team_name}</td>
+                                            <td>{team_match.date_played}</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
 
                         <div>
                             <h4 style={{ marginTop: '5%' }}>Completed Team Matchups</h4>
-                            <div className="btn-toolbar justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
-                                { this.state.team_matches.map(team_match => 
-                                    team_match.done &&
-                                    <div key={"teammatch-" + team_match.pk}>
-                                        <a className="btn-custom btn btn-secondary btn-lg mr-2" href={"/matchup/" + team_match.pk} role="button">
-                                            {team_match.home_team_name} vs. {team_match.away_team_name} <br /> {team_match.date_played}                                        
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
+                            <table className="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th className="w-40" scope="col">Home Team</th>
+                                        <th className="w-40" scope="col">Away Team</th>
+                                        <th className="w-20" scope="col">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    { this.state.team_matches.map((team_match, i) => 
+                                        team_match.done &&
+                                        <tr key={"teammatch-" + team_match.pk} className="hover" onClick={() => window.location="/matchup/" + team_match.pk}>
+                                            <td>{team_match.home_team_name}</td>
+                                            <td>{team_match.away_team_name}</td>
+                                            <td>{team_match.date_played}</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                         
                     </div>

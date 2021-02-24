@@ -8,10 +8,12 @@ class GameScoring extends React.Component {
         super(props);
         this.state = {
             game: {},
-            match: {}
+            match: {},
+            match_done: false,
         };
     
         this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
+        this.handleBeginNextGame = this.handleBeginNextGame.bind(this);
     }
 
     componentDidMount() {
@@ -30,27 +32,66 @@ class GameScoring extends React.Component {
         });
     }
 
+    game_over(game) {
+        const win_by_two = Math.abs(game.home_player_score - game.away_player_score) >= 2;
+        return ((game.home_player_score >= 11) || (game.away_player_score >= 11)) && (win_by_two);
+    }
+
     handleScorePlusOne(team, e) {
         e.preventDefault();
 
         // update state
-        const game = this.state.game;
-        const win_by_two = Math.abs(game.home_player_score - game.away_player_score) < 2;
-        if (game[team] < 11 || win_by_two) {
+        var game = this.state.game;
+        if (!game.done && !this.game_over(game)) {
             game[team] += 1;
-            this.setState({
-                game: game, 
-            });
+            if (this.game_over(game)) {
+                game.done = true; 
+
+                // update match in database 
+                var match = this.state.match;
+                const game_winner = game.home_player_score > game.away_player_score ? 'home_player_score' : 'away_player_score';
+                match[game_winner] += 1;
+                const match_winner = (match.home_player_score >= 3) || (match.away_player_score >= 3);
+                if (match_winner) {
+                    match.done = true;
+                }
+                this.setState({ 
+                    match: match,
+                    match_done: true,
+                });
+
+                axios.patch(`http://localhost:8000/api/matches`, match)
+                    .then((res) => {
+                    }, (error) => {
+                        console.log(error);
+                    });
+            }
         }
 
-        // update database
+        this.setState({ game: game });
+
+        // update game in database 
         axios.patch(`http://localhost:8000/api/games`, this.state.game)
         .then((res) => {
-            const result = res.data;
-            console.log(result)
         }, (error) => {
             console.log(error);
         });
+    }
+
+    handleBeginNextGame(match_id, game_number, e) {
+        e.preventDefault();
+        const data = {
+            'match_id': match_id,
+            'game_number': game_number
+        }
+
+        axios.post(`http://localhost:8000/api/games`, data)
+            .then((res) => {
+                const game_id = res.data.game_id
+                window.location.href = '/game/' + game_id + '/scoring';
+            }, (error) => {
+                console.log(error);
+            });
     }
 
     render() {
@@ -65,7 +106,9 @@ class GameScoring extends React.Component {
                                 <div className="col-4">
                                     <h4 className="shaded-gray">{this.state.match.home_team_name}</h4>
                                 </div>
-                                <div className="col-4"></div>
+                                <div className="col-4 align-self-center">
+                                    <h6>Game {this.state.game.game_number}</h6>
+                                </div>
                                 <div className="col-4">
                                     <h4 className="shaded-gray">{this.state.match.away_team_name}</h4>
                                 </div>
@@ -175,6 +218,13 @@ class GameScoring extends React.Component {
                                 </div>
                                 <div className="col-4">
                                     <h5 className="shaded-orange">Referee Call</h5>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-12">
+                                    { this.state.game.done && !this.state.match.done && 
+                                        <button type="button" className="btn btn-secondary btn-block btn-lg" onClick={(e) => this.handleBeginNextGame(this.state.match.match_id, this.state.game.game_number + 1, e)}>START GAME #{this.state.game.game_number + 1}</button>
+                                    }
                                 </div>
                             </div>
                         </div>

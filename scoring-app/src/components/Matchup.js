@@ -9,8 +9,8 @@ class Matchup extends React.Component {
             matches: []
         };
     
-        this.handleBeginMatch = this.handleBeginMatch.bind(this);
-        this.handleContinueMatch = this.handleContinueMatch.bind(this);
+        this.handleBeginGame = this.handleBeginGame.bind(this);
+        this.handleContinueGame = this.handleContinueGame.bind(this);
     }
 
     async componentDidMount() {
@@ -45,12 +45,11 @@ class Matchup extends React.Component {
                 info: matches_summary.data, 
                 matches: matches
             });
-
         }));
     }
 
     // Link to a game that doesn't exist
-    handleBeginMatch(match_id, game_number, e) {
+    handleBeginGame(match_id, game_number, e) {
         e.preventDefault();
         const data = {
             'match_id': match_id,
@@ -60,74 +59,83 @@ class Matchup extends React.Component {
         axios.post(`http://localhost:8000/api/games`, data)
             .then((res) => {
                 const game_id = res.data.game_id
-                this.props.history.push('/game/' + game_id + "/scoring")
+                window.location.href = '/game/' + game_id + '/scoring'
             }, (error) => {
                 console.log(error);
             });
     }
 
     // Link to a game that already exists
-    handleContinueMatch(game_id, e) {
+    handleContinueGame(game_id, e) {
         e.preventDefault();
-        this.props.history.push('/game/' + game_id + "/scoring")
+        window.location.href = '/game/' + game_id + '/scoring';
     }
 
     render() {
         const match_length = 5;
         return (
-            <div className="container">
-                <h1 style={{ marginTop: '5%' }} >Matchup</h1>
-                <h2 style={{ marginBottom: '5%' }}>{ this.state.info.home_team_name } vs { this.state.info.away_team_name } </h2>
+            <div>
+                <div id="wrap">
+                    <div id="main" className="container">
+                        <h1 style={{ marginTop: '5%' }} >Matchup</h1>
+                        <h2 style={{ marginBottom: '5%' }}>{ this.state.info.home_team_name } vs { this.state.info.away_team_name } </h2>
 
-                <table className="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th className="w-5 matchup-header" scope="col">#</th>
-                            <th className="w-25 team1-winner" scope="col">{ this.state.info.home_team_name }</th>
-                            <th className="w-40 matchup-header" scope="col">Game</th>
-                            <th className="w-25 team2-winner" scope="col">{ this.state.info.away_team_name }</th>
-                            <th className="w-5 matchup-header" scope="col">Court</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { this.state.matches.map(match => 
-                            <tr key={"match-" + match.pk}>
-                                <th scope="row"> {match.match_rank} </th>
-                                <td className={match.done && (match.home_player_score > match.away_player_score) ? "team1-winner" : ""}> {match.home_player_name} </td>
-                                <td>
-                                    { match.games.length > 0 && 
-                                        <table className="table table-sm table-bordered table-game-sum table-fixed">
-                                            <tbody>
-                                                <tr>
-                                                    { match.games.map(game => 
-                                                        <td key={"game-" + game.pk} className={game.done && (game.home_player_score > game.away_player_score) ? "team1-winner" : ""} width="20%">{game.home_player_score}</td>
-                                                    )}
-                                                    { [...Array(match_length - match.games.length)].map((e, i) => <td key={"game-filler-home-" + match.pk + "-" + i} width="20%"></td>) }
-                                                </tr>
-                                                <tr>
-                                                    { match.games.map(game => 
-                                                        <td key={"game-" + game.pk} className={game.done && (game.home_player_score < game.away_player_score) ? "team2-winner" : ""} width="20%">{game.away_player_score}</td>
-                                                    )}
-                                                    { [...Array(match_length - match.games.length)].map((e, i) => <td key={"game-filler-away-" + match.pk + "-" + i} width="20%"></td>) }
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    }
-                                    {/* wrong */}
-                                    { !match.done && (match.games.length === 0 || match.games[match.games.length - 1].done) && 
-                                        <button type="button" className="btn btn-outline-secondary m-2" onClick={(e) => this.handleBeginMatch(match.pk, match.games.length === 0 ? 1 : match.games.length + 1, e)}>BEGIN MATCH</button>
-                                    }
-                                    { !match.done && match.games.length > 0 && !match.games[match.games.length - 1].done && 
-                                        <button type="button" className="btn btn-outline-secondary m-2" onClick={(e) => this.handleContinueMatch(match.games[match.games.length - 1].pk, e)}>CONTINUE MATCH</button>
-                                    }
-                                </td>
-                                <td className={match.done && (match.home_player_score < match.away_player_score) ? "team2-winner" : ""}> {match.away_player_name} </td>
-                                <td> {match.court_number} </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-
+                        <table className="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th className="w-5 matchup-header" scope="col">#</th>
+                                    <th className="w-25 team1-winner" scope="col">{ this.state.info.home_team_name }</th>
+                                    <th className="w-40 matchup-header" scope="col">Game</th>
+                                    <th className="w-25 team2-winner" scope="col">{ this.state.info.away_team_name }</th>
+                                    <th className="w-5 matchup-header" scope="col">Court</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                { this.state.matches.map(match => 
+                                    <tr key={"match-" + match.pk}>
+                                        <th scope="row"> {match.match_rank} </th>
+                                        <td className={match.done && (match.home_player_score > match.away_player_score) ? "team1-winner" : ""}> {match.home_player_name} </td>
+                                        <td>
+                                            { match.games.length > 0 && 
+                                                <table className="table table-sm table-bordered table-game-sum table-fixed">
+                                                    <tbody>
+                                                        <tr>
+                                                            { match.games.map(game => 
+                                                                <td key={"game-" + game.pk} className={game.done && (game.home_player_score > game.away_player_score) ? "team1-winner" : ""} width="20%">{game.home_player_score}</td>
+                                                            )}
+                                                            { match.games.length < 5 && 
+                                                                [...Array(match_length - match.games.length)].map((e, i) => <td key={"game-filler-home-" + match.pk + "-" + i} width="20%"></td>)
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            { match.games.map(game => 
+                                                                <td key={"game-" + game.pk} className={game.done && (game.home_player_score < game.away_player_score) ? "team2-winner" : ""} width="20%">{game.away_player_score}</td>
+                                                            )}
+                                                            { match.games.length < 5 && 
+                                                                [...Array(match_length - match.games.length)].map((e, i) => <td key={"game-filler-away-" + match.pk + "-" + i} width="20%"></td>) 
+                                                            }
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            }
+                                            { !match.done && (match.games.length === 0 || match.games[match.games.length - 1].done) && 
+                                                <button type="button" className="btn btn-outline-secondary m-2" onClick={(e) => this.handleBeginGame(match.pk, match.games.length === 0 ? 1 : match.games.length + 1, e)}>BEGIN MATCH</button>
+                                            }
+                                            { !match.done && match.games.length > 0 && !match.games[match.games.length - 1].done && 
+                                                <button type="button" className="btn btn-outline-secondary m-2" onClick={(e) => this.handleContinueGame(match.games[match.games.length - 1].pk, e)}>CONTINUE MATCH</button>
+                                            }
+                                        </td>
+                                        <td className={match.done && (match.home_player_score < match.away_player_score) ? "team2-winner" : ""}> {match.away_player_name} </td>
+                                        <td> {match.court_number} </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <footer className="footer">
+                        <a className="nav-link" href="/">Back to Home</a>
+                </footer>
             </div>
         )
     }

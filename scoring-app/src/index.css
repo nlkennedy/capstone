@@ -40,6 +40,10 @@ code {
   min-height: 100%;
 }
 
+.hover {
+  cursor: pointer;
+}
+
 .footer {
   position: relative;
   margin-top: -60px; /* negative value of footer height */
