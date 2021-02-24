@@ -45,7 +45,25 @@ class CreateMatchup extends React.Component {
     handleSubmit = event => {
         event.preventDefault();
         // add type checking and make sure all fields are filled 
-
+        // Check inputs for special characters and don't allow to be submitted
+        var specialChars = /[^a-zA-Z0-9 ]/g;
+        //var non_nums = /[^0-9.]/g;
+        if (this.state.homeTeam.match(specialChars) || this.state.awayTeam.match(specialChars)) {
+            alert('Only characters A-Z, a-z and 0-9, are allowed.')
+            return
+        }
+        for (var j = 0; j < 9; j++) {
+            if (this.state.homePlayers[j].match(specialChars) || this.state.awayPlayers[j].match(specialChars)) {
+                    alert('Only characters A-Z, a-z and 0-9, are allowed.')
+                    return
+                }
+            if (!Number.isInteger(this.state.courts[j])) {
+                    alert('Court number must be an integer.')
+                    this.state.courts[j] = j+1
+                    return
+            }
+        }
+      
         // condense data 
         var matches = [];
         for (var i = 0; i < 9; i++) {
@@ -55,6 +73,7 @@ class CreateMatchup extends React.Component {
                 'court_number': this.state.courts[i],
                 'match_rank': i + 1,
             }
+
             matches.push(match);
         }
 
