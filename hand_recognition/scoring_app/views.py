@@ -6,22 +6,41 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+import numpy as np
+import cv2
 from functools import reduce
 
 def index(request):
     return render(request, 'scoring_app/home.html')
 
+def predict_page(request):
+    return render(request, 'scoring_app/predict.html')
 
 def gen(camera):
-    while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+    # keeping track of number of times each prediction is made
+    counter = {
+        'let' : 0,
+        'nolet' : 0,
+        'none' : 0,
+        'stroke' : 0  
+    }
+    check = False
+    bgModel = cv2.createBackgroundSubtractorMOG2(0, 50) 
 
+    while True:
+        print('calling get frame')
+        frame, counter, check, bgModel = camera.get_frame(counter, check, bgModel)
+        if frame == -1:
+            break
+        else: 
+            yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+    print('done with gen')
 
 def video_feed(request):
-    return StreamingHttpResponse(gen(VideoCamera()),
+    result = StreamingHttpResponse(gen(VideoCamera()),
                     content_type='multipart/x-mixed-replace; boundary=frame')
+    return result 
 
 @csrf_exempt
 def teams(request):
