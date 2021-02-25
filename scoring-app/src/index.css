@@ -118,7 +118,7 @@ code {
 }
 
 .scrollable {
-    height: 250px; /* this is not responsive */
+    height: 250px; /* this is not responsive 360px */
     overflow: auto;
     display: flex;
     flex-direction: column-reverse;

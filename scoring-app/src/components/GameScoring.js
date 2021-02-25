@@ -79,18 +79,17 @@ class GameScoring extends React.Component {
             game[team_score] += 1;
 
             // log serve & point
+            var team = team_score.split('_')[0];
+            this.updateSelection(team);
+            
             const point = game[team_score] + this.state.selection.side;
             var points = this.state.points;
-            var team = team_score.split('_')[0];
             if (team === "home") {
                 points.push([point, ""])
             } else {
                 points.push(["", point])
             }
             this.setState({ points: points });
-
-            // change selection if necessary
-            this.updateSelection(team);
 
             // check if game over and update done fields as necessary
             if (this.gameOver(game)) {
@@ -161,8 +160,15 @@ class GameScoring extends React.Component {
     }
 
     handleRefereeCall(team, e) {
-        // TODO
+        // TODO for Radhika & Harsh
         console.log("The " + team + " team requests a referee call");
+
+        axios.post(`http://localhost:8000/predict.html`)
+            .then((res) => {
+                console.log(res)
+            }, (error) => {
+                console.log(error);
+            });
     }
 
     render() {
