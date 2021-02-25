@@ -10,10 +10,17 @@ class GameScoring extends React.Component {
             game: {},
             match: {},
             match_done: false,
+            points: [], // entries are [home_point_selection, away_point_selection]
+            selection: {
+                team: "home", // or "away"
+                side: "R" // or "L"
+            }
         };
     
         this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
         this.handleBeginNextGame = this.handleBeginNextGame.bind(this);
+        this.handleServeChange = this.handleServeChange.bind(this);
+        this.handleRefereeCall = this.handleRefereeCall.bind(this);
     }
 
     componentDidMount() {
@@ -32,19 +39,60 @@ class GameScoring extends React.Component {
         });
     }
 
-    game_over(game) {
+    // returns the opposite selection
+    not(selection) {
+        if (selection === "R") {
+            return "L";
+        } else if (selection === "L") {
+            return "R";
+        } else if (selection === "home") {
+            return "away";
+        } else if (selection === "away") {
+            return "home";
+        }
+    }
+
+    updateSelection(team) {
+        var selection = this.state.selection;
+        if (selection.team === team) {
+            selection.side = this.not(selection.side);
+        } else {
+            selection.side = 'R'; // default to right side
+            selection.team = this.not(selection.team);
+        }
+        const id = selection.team + "-" + selection.side;
+        this.updateServeButtons(id);
+        this.setState({ selection: selection })
+    }
+
+    gameOver(game) {
         const win_by_two = Math.abs(game.home_player_score - game.away_player_score) >= 2;
         return ((game.home_player_score >= 11) || (game.away_player_score >= 11)) && (win_by_two);
     }
 
-    handleScorePlusOne(team, e) {
+    handleScorePlusOne(team_score, e) {
         e.preventDefault();
 
         // update state
         var game = this.state.game;
-        if (!game.done && !this.game_over(game)) {
-            game[team] += 1;
-            if (this.game_over(game)) {
+        if (!game.done && !this.gameOver(game)) {
+            game[team_score] += 1;
+
+            // log serve & point
+            var team = team_score.split('_')[0];
+            this.updateSelection(team);
+            
+            const point = game[team_score] + this.state.selection.side;
+            var points = this.state.points;
+            if (team === "home") {
+                points.push([point, ""])
+            } else {
+                points.push(["", point])
+            }
+            this.setState({ points: points });
+
+            // check if game over and update done fields as necessary
+            if (this.gameOver(game)) {
                 game.done = true; 
 
                 // update match in database 
@@ -94,6 +142,35 @@ class GameScoring extends React.Component {
             });
     }
 
+    updateServeButtons(id) {
+        var buttons = document.getElementsByClassName("serve-change");
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove('shaded-blue');
+        }
+        document.getElementById(id).classList.add('shaded-blue');
+    }
+
+    handleServeChange(e) {
+        const id = e.target.id.split("-");
+        var selection = this.state.selection;
+        selection.team = id[0];
+        selection.side = id[1];
+        this.setState({ selection: selection });
+        this.updateServeButtons(e.target.id)
+    }
+
+    handleRefereeCall(team, e) {
+        // TODO for Radhika & Harsh
+        console.log("The " + team + " team requests a referee call");
+
+        axios.post(`http://localhost:8000/predict.html`)
+            .then((res) => {
+                console.log(res)
+            }, (error) => {
+                console.log(error);
+            });
+    }
+
     render() {
         return (
             <div>
@@ -128,17 +205,6 @@ class GameScoring extends React.Component {
                                     </h5>
                                 </div>
                             </div>
-                            {/* <div className="row">
-                                <div className="col-4">
-                                    <img src={profile} className="img-fluid w-75" alt="" />
-                                </div>
-                                <div className="col-4 align-self-center">
-                                    <h1>4 | 5</h1>
-                                </div>
-                                <div className="col-4">
-                                    <img src={profile}  className="img-fluid w-75" alt="" />
-                                </div>
-                            </div> */}
                             <div className="row">
                                 <div className="col-4">
                                     <div className="row">
@@ -150,43 +216,27 @@ class GameScoring extends React.Component {
                                     </div>
                                     <div className="row">
                                         <div className="col-12">
-                                            <h3 className="game-button">L</h3>
+                                            <h3 id="home-L" className="serve-change game-button" type="button" onClick={this.handleServeChange}>L</h3>
                                         </div>
                                     </div>
                                     <div className="row">
-                                        <div className="col-12">
-                                            <h3 className="game-button">R</h3>
+                                        <div className="col-12"> 
+                                            <h3 id="home-R" className="serve-change game-button shaded-blue" type="button" onClick={this.handleServeChange}>R</h3>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-4 align-self-center">
-                                    <div className="container">
-                                        <h5>
-                                            <div className="row">
-                                                <div className="col-6 text-right"></div>
-                                                <div className="col-6 text-left">1L</div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col-6 text-right">1R</div>
-                                                <div className="col-6 text-left"></div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col-6 text-right">2L</div>
-                                                <div className="col-6 text-left"></div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col-6 text-right"></div>
-                                                <div className="col-6 text-left">2R</div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col-6 text-right"></div>
-                                                <div className="col-6 text-left">3L</div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col-6 text-right"></div>
-                                                <div className="col-6 text-left">4R</div>
-                                            </div>
-                                        </h5>
+                                <div className="col-4">
+                                    <div className="scrollable"> 
+                                        <div className="container">
+                                            <h5>
+                                                { this.state.points.map((point, i) => 
+                                                    <div key={"point-" + i} className="row">
+                                                        <div className="col-6 text-right">{point[0]}</div>
+                                                        <div className="col-6 text-left">{point[1]}</div>
+                                                    </div>
+                                                )}
+                                            </h5>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="col-4">
@@ -199,25 +249,25 @@ class GameScoring extends React.Component {
                                     </div>
                                     <div className="row">
                                         <div className="col-12">
-                                            <h3 className="game-button">L</h3>
+                                            <h3 id="away-L" className="serve-change game-button" type="button" onClick={this.handleServeChange}>L</h3>
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="col-12">
-                                            <h3 className="shaded-blue game-button">R</h3>
+                                            <h3 id="away-R" className="serve-change game-button" type="button" onClick={this.handleServeChange}>R</h3>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col-4">
-                                    <h5 className="shaded-orange">Referee Call</h5>
+                                    <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("home", e)}>Referee Call</h5>
                                 </div>
                                 <div className="col-4">
                                     <h5 className="shaded-red game-button">Undo</h5>
                                 </div>
                                 <div className="col-4">
-                                    <h5 className="shaded-orange">Referee Call</h5>
+                                    <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("away", e)}>Referee Call</h5>
                                 </div>
                             </div>
                             <div className="row">
