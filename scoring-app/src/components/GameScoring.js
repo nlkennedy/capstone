@@ -21,6 +21,7 @@ class GameScoring extends React.Component {
         this.handleBeginNextGame = this.handleBeginNextGame.bind(this);
         this.handleServeChange = this.handleServeChange.bind(this);
         this.handleRefereeCall = this.handleRefereeCall.bind(this);
+        this.updateDimensions = this.updateDimensions.bind(this);
     }
 
     componentDidMount() {
@@ -36,7 +37,26 @@ class GameScoring extends React.Component {
                 game: data.game_data, 
                 match: data.match_data
             });
+
+            window.addEventListener("resize", this.updateDimensions);
+            this.updateDimensions();
         });
+    }
+
+    componentDidUpdate() {
+        this.updateDimensions();
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.updateDimensions);
+    }
+
+    updateDimensions() {
+        document.getElementById("scrollable").style["height"] = 0 + "px";
+        const target_height = document.getElementById("target").clientHeight;
+        if (target_height < 400) {
+            document.getElementById("scrollable").style["height"] = target_height + "px";
+        }
     }
 
     // returns the opposite selection
@@ -206,7 +226,7 @@ class GameScoring extends React.Component {
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="col-4">
+                                <div id="target" className="col-4">
                                     <div className="row">
                                         <div className="col-12">
                                             <button className="shaded-gray" onClick={(e) => this.handleScorePlusOne("home_player_score", e)}>
@@ -226,7 +246,7 @@ class GameScoring extends React.Component {
                                     </div>
                                 </div>
                                 <div className="col-4">
-                                    <div className="scrollable"> 
+                                    <div id="scrollable" className="scrollable"> 
                                         <div className="container">
                                             <h5>
                                                 { this.state.points.map((point, i) => 
