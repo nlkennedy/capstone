@@ -117,6 +117,14 @@ code {
   padding: 5%;
 }
 
+.scrollable {
+    height: 250px; /* this is not responsive 360px */
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+    background-color: #e9ecef;
+}
+
 /* Game Scoreboard */
 .scoreboard {
   font-size: 7rem;
