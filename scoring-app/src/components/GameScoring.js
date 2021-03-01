@@ -16,11 +16,16 @@ class GameScoring extends React.Component {
                 side: "R" // or "L"
             }
         };
-    
+
         this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
         this.handleBeginNextGame = this.handleBeginNextGame.bind(this);
         this.handleServeChange = this.handleServeChange.bind(this);
         this.handleRefereeCall = this.handleRefereeCall.bind(this);
+        this.updateDimensions = this.updateDimensions.bind(this);
+        this.handleLoad = this.handleLoad.bind(this);
+        this.getInitialPointsState = this.getInitialPointsState.bind(this);
+        this.removePointsState = this.removePointsState.bind(this);
+        this.updatePointsState = this.updatePointsState.bind(this);
     }
 
     componentDidMount() {
@@ -34,9 +39,49 @@ class GameScoring extends React.Component {
             const data = res.data;
             this.setState({
                 game: data.game_data, 
-                match: data.match_data
+                match: data.match_data,
+                points: this.getInitialPointsState(game_id)
             });
+            
+            window.addEventListener('load', this.handleLoad);
+            window.addEventListener("resize", this.updateDimensions);
+            this.updateDimensions();
         });
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('load', this.handleLoad);
+        window.removeEventListener("resize", this.updateDimensions);
+    }
+
+    componentDidUpdate() {
+        this.updateDimensions();
+    }
+
+    handleLoad() {
+        this.updateDimensions();
+    }
+
+    updateDimensions() {
+        document.getElementById("scrollable").style["height"] = 0 + "px";
+        const target_height = document.getElementById("target").clientHeight;
+        if (target_height < 400) {
+            document.getElementById("scrollable").style["height"] = target_height + "px";
+        }
+    }
+
+    // functions to deal with local storange for points
+    getInitialPointsState(game_id) {
+        return JSON.parse(localStorage.getItem('points-' + game_id)) || [];
+    }
+
+    removePointsState(game_id) {
+        localStorage.removeItem('points-' + game_id);
+    }
+
+    updatePointsState(game_id, points) {
+        this.setState({ points: points});
+        localStorage.setItem('points-' + game_id, JSON.stringify(points));
     }
 
     // returns the opposite selection
@@ -89,11 +134,12 @@ class GameScoring extends React.Component {
             } else {
                 points.push(["", point])
             }
-            this.setState({ points: points });
+            this.updatePointsState(game.game_id, points)
 
             // check if game over and update done fields as necessary
             if (this.gameOver(game)) {
                 game.done = true; 
+                this.removePointsState(game.game_id);
 
                 // update match in database 
                 var match = this.state.match;
@@ -206,7 +252,7 @@ class GameScoring extends React.Component {
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="col-4">
+                                <div id="target" className="col-4">
                                     <div className="row">
                                         <div className="col-12">
                                             <button className="shaded-gray" onClick={(e) => this.handleScorePlusOne("home_player_score", e)}>
@@ -226,7 +272,7 @@ class GameScoring extends React.Component {
                                     </div>
                                 </div>
                                 <div className="col-4">
-                                    <div className="scrollable"> 
+                                    <div id="scrollable" className="scrollable"> 
                                         <div className="container">
                                             <h5>
                                                 { this.state.points.map((point, i) => 

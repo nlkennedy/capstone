@@ -6,8 +6,8 @@ class CreateMatchup extends React.Component {
         super(props);
         this.state = {
             // change default to "" when finished testing 
-            homeTeam: "Home Team Name",
-            awayTeam: "Away Team Name",
+            homeTeam: "Tufts",
+            awayTeam: "Bowdoin",
             homePlayers: ["homeA", "homeB", "homeC", "homeD", "homeE", "homeF", "homeG", "homeH", "homeI"], //Array(9).fill(""),
             awayPlayers: ["awayA", "awayB", "awayC", "awayD", "awayE", "awayF", "awayG", "awayH", "awayI"], //Array(9).fill(""),
             courts: [1, 2, 3, 4, 5, 6, 7, 8, 9] // Array(9).fill("")
