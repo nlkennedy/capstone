@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import axiosInstance from './axios';
 
 class Home extends React.Component {
     state = {
@@ -7,7 +7,7 @@ class Home extends React.Component {
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:8000/api/teammatches-summary`)
+        axiosInstance.get(`api/teammatches-summary`)
         .then(res => {
             const team_matches = res.data.reverse();
             this.setState({ team_matches });

@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import axiosInstance from './axios';
 
 class CreateMatchup extends React.Component {
     constructor(props) {
@@ -83,7 +83,7 @@ class CreateMatchup extends React.Component {
             'matches': matches
         }
 
-        axios.post(`http://localhost:8000/api/teammatches-all`, data)
+        axiosInstance.post(`api/teammatches-all`, data)
             .then((res) => {
                 const team_match_id = res.data.team_match_id
                 window.location.href = '/matchup/' + team_match_id;

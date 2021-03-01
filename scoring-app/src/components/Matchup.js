@@ -1,4 +1,5 @@
 import React from 'react';
+import axiosInstance from './axios';
 import axios from 'axios';
 
 class Matchup extends React.Component {
@@ -19,7 +20,7 @@ class Matchup extends React.Component {
 
         // Get matches summary which contains all match ids
         const [matches_summary] = await Promise.all([
-            axios.get(`http://localhost:8000/api/matches-summary`, {
+            axiosInstance.get(`api/matches-summary`, {
                 params: {
                     team_match_id: window.location.pathname.split('/')[2]
                 }
@@ -27,7 +28,7 @@ class Matchup extends React.Component {
         ]);
       
         // Make request for every match to get the game summary
-        axios.all(matches_summary.data.matches.map(match => axios.get(`http://localhost:8000/api/games-summary`, {
+        axios.all(matches_summary.data.matches.map(match => axiosInstance.get(`api/games-summary`, {
             params: {
                 match_id: match.pk
             }
@@ -56,7 +57,7 @@ class Matchup extends React.Component {
             'game_number': game_number
         }
 
-        axios.post(`http://localhost:8000/api/games`, data)
+        axiosInstance.post(`api/games`, data)
             .then((res) => {
                 const game_id = res.data.game_id
                 window.location.href = '/game/' + game_id + '/scoring'

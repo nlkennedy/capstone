@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import axiosInstance from './axios';
 
 class GameScoreboard extends React.Component {
     constructor(props) {
@@ -12,7 +12,7 @@ class GameScoreboard extends React.Component {
 
     componentDidMount() {
         const game_id = window.location.pathname.split('/')[2];
-        axios.get(`http://localhost:8000/api/games`, {
+        axiosInstance.get(`api/games`, {
             params: {
                 game_id: game_id
             }

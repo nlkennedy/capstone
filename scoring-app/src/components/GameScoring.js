@@ -1,7 +1,7 @@
 import React from 'react';
 // import profile from '../images/person.jpg';
 import plus from '../images/plus.png';
-import axios from 'axios';
+import axiosInstance from './axios';
 
 class GameScoring extends React.Component {
     constructor(props) {
@@ -30,7 +30,7 @@ class GameScoring extends React.Component {
 
     componentDidMount() {
         const game_id = window.location.pathname.split('/')[2];
-        axios.get(`http://localhost:8000/api/games`, {
+        axiosInstance.get(`api/games`, {
             params: {
                 game_id: game_id
             }
@@ -154,7 +154,7 @@ class GameScoring extends React.Component {
                     match_done: true,
                 });
 
-                axios.patch(`http://localhost:8000/api/matches`, match)
+                axiosInstance.patch(`api/matches`, match)
                     .then((res) => {
                     }, (error) => {
                         console.log(error);
@@ -165,7 +165,7 @@ class GameScoring extends React.Component {
         this.setState({ game: game });
 
         // update game in database 
-        axios.patch(`http://localhost:8000/api/games`, this.state.game)
+        axiosInstance.patch(`api/games`, this.state.game)
         .then((res) => {
         }, (error) => {
             console.log(error);
@@ -179,7 +179,7 @@ class GameScoring extends React.Component {
             'game_number': game_number
         }
 
-        axios.post(`http://localhost:8000/api/games`, data)
+        axiosInstance.post(`api/games`, data)
             .then((res) => {
                 const game_id = res.data.game_id
                 window.location.href = '/game/' + game_id + '/scoring';
@@ -209,7 +209,7 @@ class GameScoring extends React.Component {
         // TODO for Radhika & Harsh
         console.log("The " + team + " team requests a referee call");
 
-        axios.post(`http://localhost:8000/predict.html`)
+        axiosInstance.post(`predict.html`)
             .then((res) => {
                 console.log(res)
             }, (error) => {
