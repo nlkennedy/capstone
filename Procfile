@@ -1,0 +1,1 @@
+web: cd scoring-app/ && yarn start
