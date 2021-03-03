@@ -15,10 +15,10 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "cd scoring-app && react-scripts start",
+    "build": "cd scoring-app && react-scripts build",
+    "test": "cd scoring-app && react-scripts test",
+    "eject": "cd scoring-app && react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
