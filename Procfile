@@ -1,1 +1,1 @@
-web: cd scoring-app/ && yarn start
+web: cd scoring-app/ && react-scripts start
