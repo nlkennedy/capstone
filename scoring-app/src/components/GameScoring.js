@@ -162,9 +162,11 @@ class GameScoring extends React.Component {
     handleRefereeCall(team, e) {
         // TODO for Radhika & Harsh
         console.log("The " + team + " team requests a referee call");
+        window.open('http://localhost:8000/predict.html', null, 'height=1000,width=1200,status=yes,toolbar=no,menubar=no,location=no');
 
-        axios.post(`http://localhost:8000/predict.html`)
+        axios.get(`http://localhost:8000/predict.html`)
             .then((res) => {
+                console.log('got predict.html')
                 console.log(res)
             }, (error) => {
                 console.log(error);

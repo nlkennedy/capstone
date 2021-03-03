@@ -36,6 +36,7 @@ def gen(camera):
             yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
     print('done with gen')
+    return 101
 
 def video_feed(request):
     result = StreamingHttpResponse(gen(VideoCamera()),
