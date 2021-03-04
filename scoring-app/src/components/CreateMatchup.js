@@ -59,7 +59,9 @@ class CreateMatchup extends React.Component {
                 }
             if (!Number.isInteger(this.state.courts[j])) {
                     alert('Court number must be an integer.')
-                    this.state.courts[j] = j+1
+                    var courts = this.state.courts;
+                    courts[j] = j+1;
+                    this.setState({ courts: courts });
                     return
             }
         }
