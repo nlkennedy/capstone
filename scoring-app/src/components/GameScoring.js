@@ -222,15 +222,20 @@ class GameScoring extends React.Component {
         this.updateServeButtons(e.target.id)
     }
 
+// maybe fake a camera using javascript while the actual predictions are made underneath
     handleRefereeCall(team, e) {
-        // TODO for Radhika & Harsh
         console.log("The " + team + " team requests a referee call");
-        window.open('http://localhost:8000/predict.html', null, 'height=1000,width=1200,status=yes,toolbar=no,menubar=no,location=no');
+        window.open('http://localhost:8000/video_feed', null, 'height=1000,width=1200,status=yes,toolbar=no,menubar=no,location=no');
+        var keys = {
+            'let' : 'let',
+            'nlt' : 'nolet',
+            'str' : 'stroke'  
+        };
 
-        axiosInstance.get(`predict.html`)
+        axiosInstance.get(`video_feed`)
             .then((res) => {
-                console.log('got predict.html')
-                console.log(res)
+                console.log(keys[res.data.substr(res.data.length-3, res.data.length)])
+                localStorage.setItem('prediction',keys[res.data.substr(res.data.length-3, res.data.length)])
             }, (error) => {
                 console.log(error);
             });
