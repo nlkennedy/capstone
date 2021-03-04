@@ -6,11 +6,27 @@ class GameScoreboard extends React.Component {
         super(props);
         this.state = {
             game: {},
-            match: {},
+            match: {}
         };
+
+        this.updateStateFromDatabase = this.updateStateFromDatabase.bind(this);
+        this.updateState = this.updateState.bind(this);
     }
 
     componentDidMount() {
+        if (typeof window !== 'undefined') {
+            window.addEventListener('storage', this.updateState);
+        }
+        this.updateState();
+    }
+
+    componentWillUnmount(){
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('storage', this.updateState);
+        }
+    }
+
+    updateStateFromDatabase() {
         const game_id = window.location.pathname.split('/')[2];
         axiosInstance.get(`api/games`, {
             params: {
@@ -24,6 +40,19 @@ class GameScoreboard extends React.Component {
                 match: data.match_data,
             });
         });
+    }
+
+    updateState() {
+        const game_id = window.location.pathname.split('/')[2];
+        const game = JSON.parse(localStorage.getItem('game-' + game_id)) || {};
+        const match = JSON.parse(localStorage.getItem('match-' + game_id)) || {};
+
+        if (Object.keys(game).length === 0 || Object.keys(match).length === 0) {
+            this.updateStateFromDatabase();
+        } else {
+            this.setState({ game: game });
+            this.setState({ match: match });
+        }
     }
 
     render() {

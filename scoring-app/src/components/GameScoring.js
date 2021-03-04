@@ -26,6 +26,8 @@ class GameScoring extends React.Component {
         this.getInitialPointsState = this.getInitialPointsState.bind(this);
         this.removePointsState = this.removePointsState.bind(this);
         this.updatePointsState = this.updatePointsState.bind(this);
+        this.removeScoreboardState = this.removeScoreboardState.bind(this);
+        this.updateScoreboardState = this.updateScoreboardState.bind(this);
     }
 
     componentDidMount() {
@@ -46,12 +48,14 @@ class GameScoring extends React.Component {
             window.addEventListener('load', this.handleLoad);
             window.addEventListener("resize", this.updateDimensions);
             this.updateDimensions();
+            this.updateScoreboardState(game_id);
         });
     }
 
     componentWillUnmount() {
         window.removeEventListener('load', this.handleLoad);
         window.removeEventListener("resize", this.updateDimensions);
+        this.removeScoreboardState();
     }
 
     componentDidUpdate() {
@@ -82,6 +86,18 @@ class GameScoring extends React.Component {
     updatePointsState(game_id, points) {
         this.setState({ points: points});
         localStorage.setItem('points-' + game_id, JSON.stringify(points));
+    }
+
+    // functions to deal with local storange for scoreboard state
+    removeScoreboardState() {
+        const game_id = this.state.game.game_id;
+        localStorage.removeItem('game-' + game_id);
+        localStorage.removeItem('match-' + game_id);
+    }
+
+    updateScoreboardState(game_id) {
+        localStorage.setItem('game-' + game_id, JSON.stringify(this.state.game));
+        localStorage.setItem('match-' + game_id, JSON.stringify(this.state.match));
     }
 
     // returns the opposite selection
@@ -163,6 +179,7 @@ class GameScoring extends React.Component {
         }
 
         this.setState({ game: game });
+        this.updateScoreboardState(game.game_id);
 
         // update game in database 
         axiosInstance.patch(`api/games`, this.state.game)
