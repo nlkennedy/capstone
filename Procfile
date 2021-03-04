@@ -1,2 +1,1 @@
-web: cd scoring-app/ && react-scripts start
-api: cd hand_recognition && python3 manage.py runserver
+web: cd hand_recognition && gunicorn hand_recognition.wsgi
