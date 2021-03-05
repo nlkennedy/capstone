@@ -2,6 +2,7 @@ import React from 'react';
 // import profile from '../images/person.jpg';
 import plus from '../images/plus.png';
 import axiosInstance from './axios';
+import Webcam from "react-webcam";
 
 class GameScoring extends React.Component {
     constructor(props) {
@@ -14,7 +15,8 @@ class GameScoring extends React.Component {
             selection: {
                 team: "home", // or "away"
                 side: "R" // or "L"
-            }
+            },
+            webcamEnabled: false
         };
 
         this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
@@ -28,6 +30,8 @@ class GameScoring extends React.Component {
         this.updatePointsState = this.updatePointsState.bind(this);
         this.removeScoreboardState = this.removeScoreboardState.bind(this);
         this.updateScoreboardState = this.updateScoreboardState.bind(this);
+        this.openWebcamModal = this.openWebcamModal.bind(this);
+        this.closeWebcamModal = this.closeWebcamModal.bind(this);
     }
 
     componentDidMount() {
@@ -84,7 +88,7 @@ class GameScoring extends React.Component {
     }
 
     updatePointsState(game_id, points) {
-        this.setState({ points: points});
+        this.setState({ points: points });
         localStorage.setItem('points-' + game_id, JSON.stringify(points));
     }
 
@@ -225,18 +229,42 @@ class GameScoring extends React.Component {
     handleRefereeCall(team, e) {
         // TODO for Radhika & Harsh
         console.log("The " + team + " team requests a referee call");
-        window.open('http://localhost:8000/predict.html', null, 'height=1000,width=1200,status=yes,toolbar=no,menubar=no,location=no');
+        this.openWebcamModal();
+        // window.open('http://localhost:8000/predict.html', null, 'height=1000,width=1200,status=yes,toolbar=no,menubar=no,location=no');
 
-        axiosInstance.get(`predict.html`)
-            .then((res) => {
-                console.log('got predict.html')
-                console.log(res)
-            }, (error) => {
-                console.log(error);
-            });
+        // axiosInstance.get(`predict.html`)
+        //     .then((res) => {
+        //         console.log('got predict.html')
+        //         console.log(res)
+        //     }, (error) => {
+        //         console.log(error);
+        //     });
+    }
+
+    openWebcamModal() {
+        this.setState(
+            { webcamEnabled: true }, 
+            () => {
+                document.getElementById("backdrop").style.display = "block";
+                document.getElementById("webcamModal").style.display = "block";
+                document.getElementById("webcamModal").className += "show";
+            }
+        );
+    }
+
+    closeWebcamModal() {
+        document.getElementById("backdrop").style.display = "none";
+        document.getElementById("webcamModal").style.display = "none";
+        document.getElementById("webcamModal").className += document.getElementById("webcamModal").className.replace("show", "");
+        this.setState({ webcamEnabled: false })
     }
 
     render() {
+        const videoConstraints = {
+            width: 1280,
+            height: 720,
+            aspectRatio: 1
+        };
         return (
             <div>
                 <div id="wrap">
@@ -348,6 +376,35 @@ class GameScoring extends React.Component {
                 <footer className="footer">
                     <a className="nav-link" href={"/matchup/" + this.state.match.team_match_id}>Back to Team Matchup</a>
                 </footer>
+
+                { this.state.webcamEnabled &&
+                    <div className="modal fade" id="webcamModal" tabIndex="-1" aria-labelledby="webcamModalLabel" aria-modal="true"
+                        role="dialog">
+                        <div className="modal-dialog modal-lg" role="document">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title" id="webcamModalLabel">
+                                        Make your call
+                                    </h5>
+                                    <button type="button" className="close" aria-label="Close" onClick={this.closeWebcamModal}>
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="text-center scoreboard">
+                                        <Webcam 
+                                            videoConstraints={videoConstraints} 
+                                            audio={false}
+                                            mirrored={true}
+                                            style={{width: '100%'}}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div className="modal-backdrop fade show" id="backdrop" style={{ display: 'none'}} ></div>
             </div>
         )
     }
