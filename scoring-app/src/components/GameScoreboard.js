@@ -118,8 +118,7 @@ class GameScoreboard extends React.Component {
                     <button type="button" className="btn btn-primary" onClick={this.openModal}>
                         Temporary Modal button
                     </button>
-                    <div className="modal fade" id="refCallModal" tabIndex="-1" aria-labelledby="refCallModalLabel" aria-modal="true"
-                        role="dialog">
+                    <div className="modal fade" id="refCallModal" tabIndex="-1" aria-labelledby="refCallModalLabel" aria-modal="true" role="dialog">
                         <div className="modal-dialog" role="document">
                             <div className="modal-content">
                                 <div className="modal-header">
