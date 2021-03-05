@@ -1,1 +1,2 @@
-web: cd hand_recognition && gunicorn hand_recognition.wsgi
+release: python manage.py migrate
+web: gunicorn hand_recognition.wsgi --log-file -
