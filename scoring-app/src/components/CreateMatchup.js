@@ -5,12 +5,12 @@ class CreateMatchup extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // change default to "" when finished testing 
+            // change default to '' when finished testing 
             homeTeam: "Tufts",
             awayTeam: "Bowdoin",
-            homePlayers: ["homeA", "homeB", "homeC", "homeD", "homeE", "homeF", "homeG", "homeH", "homeI"], //Array(9).fill(""),
-            awayPlayers: ["awayA", "awayB", "awayC", "awayD", "awayE", "awayF", "awayG", "awayH", "awayI"], //Array(9).fill(""),
-            courts: [1, 2, 3, 4, 5, 6, 7, 8, 9] // Array(9).fill("")
+            homePlayers: ["homeA", "homeB", "homeC", "homeD", "homeE", "homeF", "homeG", "homeH", "homeI"], //Array(9).fill(''),
+            awayPlayers: ["awayA", "awayB", "awayC", "awayD", "awayE", "awayF", "awayG", "awayH", "awayI"], //Array(9).fill(''),
+            courts: [1, 2, 3, 4, 5, 6, 7, 8, 9] // Array(9).fill('')
         };
     
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -44,28 +44,38 @@ class CreateMatchup extends React.Component {
 
     handleSubmit = event => {
         event.preventDefault();
-        // add type checking and make sure all fields are filled 
-        // Check inputs for special characters and don't allow to be submitted
+
+        // form validation: all fields are required and special characters are not allowed
         var specialChars = /[^a-zA-Z0-9 ]/g;
-        //var non_nums = /[^0-9.]/g;
+        // validate team names
         if (this.state.homeTeam.match(specialChars) || this.state.awayTeam.match(specialChars)) {
             alert('Only characters A-Z, a-z and 0-9, are allowed.')
-            return
+            return;
         }
+
+        if (this.state.homeTeam === '' || this.state.awayTeam === '') {
+            alert('All fields are required.');
+            return;
+        }
+
+        // validate homePlayers, awayPlayers, courts
         for (var j = 0; j < 9; j++) {
+            if (this.state.homePlayers[j] === '' || this.state.homePlayers[j] === '' || this.state.courts[j] === '') {
+                alert('All fields are required.')
+                return;
+            }
+
             if (this.state.homePlayers[j].match(specialChars) || this.state.awayPlayers[j].match(specialChars)) {
-                    alert('Only characters A-Z, a-z and 0-9, are allowed.')
-                    return
-                }
-            if (!Number.isInteger(this.state.courts[j])) {
-                    alert('Court number must be an integer.')
-                    var courts = this.state.courts;
-                    courts[j] = j+1;
-                    this.setState({ courts: courts });
-                    return
+                alert('Only characters A-Z, a-z and 0-9, are allowed.');
+                return;
+            }
+
+            if (!Number.isInteger(+this.state.courts[j])) {
+                alert('Court number must be an integer.')
+                return;
             }
         }
-      
+
         // condense data 
         var matches = [];
         for (var i = 0; i < 9; i++) {
