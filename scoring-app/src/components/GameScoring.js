@@ -237,7 +237,6 @@ class GameScoring extends React.Component {
         const game_id = this.state.game.game_id;
         this.openWebcamModal();
 
-        // window.open('http://localhost:8000/video_feed', null, 'height=1000,width=1200,status=yes,toolbar=no,menubar=no,location=no');
         var keys = {
             'let' : 'LET',
             'nlt' : 'NO LET',
@@ -246,12 +245,19 @@ class GameScoring extends React.Component {
 
         axiosInstance.get(`video_feed`)
             .then((res) => {
-                this.closeWebcamModal();
                 const prediction = {
                     'call': keys[res.data.substr(res.data.length-3, res.data.length)],
                     'team': this.state.match[team + "_team_name"]
                 };
-                this.updatePredictionState(game_id, prediction);
+
+                var toDisplay = 'Here is your prediction: ' + prediction.call + '\n\nPlease select OK if the prediction looks correct. Otherwise, press cancel and input your prediction again.';
+                if (window.confirm(toDisplay)) {
+                  this.updatePredictionState(game_id, prediction);
+                  this.closeWebcamModal();
+                }
+                else {
+                    this.handleRefereeCall(team, e);
+                }
             }, (error) => {
                 console.log(error);
             });
@@ -400,7 +406,7 @@ class GameScoring extends React.Component {
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <h5 className="modal-title" id="webcamModalLabel">
-                                        Make your call
+                                        Generating prediction!
                                     </h5>
                                     <button type="button" className="close" aria-label="Close" onClick={this.closeWebcamModal}>
                                         <span aria-hidden="true">×</span>
