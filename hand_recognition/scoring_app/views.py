@@ -13,7 +13,7 @@ import cv2
 from functools import reduce
 
 specialChars = re.compile('[@_!#$%^&*()<>?/\|}{~:=]')
-
+done = False 
 def representsInt(s):
     try: 
         int(s)
@@ -25,7 +25,7 @@ def index(request):
     return render(request, 'scoring_app/home.html')
 
 def predict_page(request):
-    return render(request, 'scoring_app/predict.html')
+    return render(request, 'scoring_app/predict.html') 
 
 def gen(camera):
     # keeping track of number of times each prediction is made
@@ -35,6 +35,11 @@ def gen(camera):
         'none' : 0,
         'stroke' : 0  
     }
+    shortened = {
+        'let' : 'let',
+        'nolet' : 'nlt',
+        'stroke' : 'str'  
+    }
     check = False
     bgModel = cv2.createBackgroundSubtractorMOG2(0, 50) 
 
@@ -42,17 +47,25 @@ def gen(camera):
         print('calling get frame')
         frame, counter, check, bgModel = camera.get_frame(counter, check, bgModel)
         if frame == -1:
+            counter = dict(sorted(counter.items(), key=lambda item: item[1]))
+            print('sorted ', counter)
+            answer = shortened[list(counter)[3]]
+            print('Final answer ', answer)
+            yield (answer)
             break
         else: 
             yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
     print('done with gen')
-    return 101
+    return 'Hi!!'
 
 def video_feed(request):
     result = StreamingHttpResponse(gen(VideoCamera()),
-                    content_type='multipart/x-mixed-replace; boundary=frame')
-    return result 
+                content_type='multipart/x-mixed-replace; boundary=frame')
+    # if done:
+    #     result = HttpResponse("HELLO")
+
+    return result
 
 @csrf_exempt
 def teams(request):

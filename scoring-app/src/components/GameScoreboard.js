@@ -6,7 +6,8 @@ class GameScoreboard extends React.Component {
         super(props);
         this.state = {
             game: {},
-            match: {}
+            match: {},
+            prediction: {}
         };
 
         this.updateStateFromDatabase = this.updateStateFromDatabase.bind(this);
@@ -48,16 +49,27 @@ class GameScoreboard extends React.Component {
         const game_id = window.location.pathname.split('/')[2];
         const game = JSON.parse(localStorage.getItem('game-' + game_id)) || {};
         const match = JSON.parse(localStorage.getItem('match-' + game_id)) || {};
+        const prediction = JSON.parse(localStorage.getItem('prediction-' + game_id)) || {};
 
+        // update state
         if (Object.keys(game).length === 0 || Object.keys(match).length === 0) {
             this.updateStateFromDatabase();
         } else {
-            this.setState({ game: game });
-            this.setState({ match: match });
+            this.setState({ 
+                game: game, 
+                match: match
+            });
+        }
+
+        // show prediction if exists
+        if (Object.keys(prediction).length !== 0) {
+            this.setState({prediction: prediction});
+            this.openModal();
+            localStorage.removeItem('prediction-' + game_id);
         }
     }
 
-     openModal() {
+    openModal() {
         document.getElementById("backdrop").style.display = "block";
         document.getElementById("refCallModal").style.display = "block";
         document.getElementById("refCallModal").className += "show";
@@ -66,7 +78,7 @@ class GameScoreboard extends React.Component {
         setTimeout(this.closeModal, 5000);
     }
 
-     closeModal() {
+    closeModal() {
         document.getElementById("backdrop").style.display = "none";
         document.getElementById("refCallModal").style.display = "none";
         document.getElementById("refCallModal").className += document.getElementById("refCallModal").className.replace("show", "");
@@ -115,15 +127,13 @@ class GameScoreboard extends React.Component {
                 </div>
 
                 <div>
-                    <button type="button" className="btn btn-primary" onClick={this.openModal}>
-                        Temporary Modal button
-                    </button>
-                    <div className="modal fade" id="refCallModal" tabIndex="-1" aria-labelledby="refCallModalLabel" aria-modal="true" role="dialog">
+                    <div className="modal fade" id="refCallModal" tabIndex="-1" aria-labelledby="refCallModalLabel" aria-modal="true"
+                        role="dialog">
                         <div className="modal-dialog" role="document">
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <h5 className="modal-title" id="refCallModalLabel">
-                                        Referee Call Made By ----
+                                        Referee Call Requested By {this.state.prediction.team}
                                     </h5>
                                     <button type="button" className="close" aria-label="Close" onClick={this.closeModal}>
                                         <span aria-hidden="true">×</span>
@@ -131,7 +141,7 @@ class GameScoreboard extends React.Component {
                                 </div>
                                 <div className="modal-body">
                                     <div className="text-center scoreboard">
-                                        LET
+                                        {this.state.prediction.call}
                                     </div>
                                 </div>
                             </div>
