@@ -21,6 +21,7 @@ whitenoise = "*"
 Django = "*"
 Keras = "*"
 Keras-Preprocessing = "*"
+opencv-python = "*"
 
 [dev-packages]
 
