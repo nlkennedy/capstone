@@ -160,11 +160,13 @@ class GameScoring extends React.Component {
                 points.push(["", point])
             }
             this.updatePointsState(game.game_id, points)
+            this.updateScoreboardState(game.game_id);
 
             // check if game over and update done fields as necessary
             if (this.gameOver(game)) {
                 game.done = true; 
                 this.removePointsState(game.game_id);
+                this.removeScoreboardState(game.game_data);
 
                 // update match in database 
                 var match = this.state.match;
@@ -188,7 +190,6 @@ class GameScoring extends React.Component {
         }
 
         this.setState({ game: game });
-        this.updateScoreboardState(game.game_id);
 
         // update game in database 
         axiosInstance.patch(`api/games`, this.state.game)

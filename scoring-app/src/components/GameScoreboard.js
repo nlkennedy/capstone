@@ -62,7 +62,7 @@ class GameScoreboard extends React.Component {
         }
 
         // show prediction if exists
-        if (Object.keys(prediction).length != 0) {
+        if (Object.keys(prediction).length !== 0) {
             this.setState({prediction: prediction});
             this.openModal();
             localStorage.removeItem('prediction-' + game_id);
