@@ -29,6 +29,7 @@ class GameScoring extends React.Component {
         this.updatePointsState = this.updatePointsState.bind(this);
         this.removeScoreboardState = this.removeScoreboardState.bind(this);
         this.updateScoreboardState = this.updateScoreboardState.bind(this);
+        this.updateScoreboardLocation = this.updateScoreboardLocation.bind(this);
         this.updatePredictionState = this.updatePredictionState.bind(this);
         this.openWebcamModal = this.openWebcamModal.bind(this);
         this.closeWebcamModal = this.closeWebcamModal.bind(this);
@@ -107,6 +108,11 @@ class GameScoring extends React.Component {
     updateScoreboardState(game_id) {
         localStorage.setItem('game-' + game_id, JSON.stringify(this.state.game));
         localStorage.setItem('match-' + game_id, JSON.stringify(this.state.match));
+    }
+
+    updateScoreboardLocation(new_game) {
+        const game_id = this.state.game.game_id;
+        localStorage.setItem('newgame-' + game_id, new_game);
     }
 
     // returns the opposite selection
@@ -209,6 +215,7 @@ class GameScoring extends React.Component {
         axiosInstance.post(`api/games`, data)
             .then((res) => {
                 const game_id = res.data.game_id
+                this.updateScoreboardLocation(game_id);
                 window.location.href = '/game/' + game_id + '/scoring';
             }, (error) => {
                 console.log(error);
@@ -396,6 +403,7 @@ class GameScoring extends React.Component {
                     </div>
                 </div>
                 <footer className="footer">
+                    <a className="nav-link" href={"/game/" + this.state.game.game_id + "/scoreboard"} rel="noreferrer" target="_blank">Scoreboard View</a>
                     <a className="nav-link" href={"/matchup/" + this.state.match.team_match_id}>Back to Team Matchup</a>
                 </footer>
 
