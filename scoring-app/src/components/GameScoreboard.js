@@ -50,6 +50,7 @@ class GameScoreboard extends React.Component {
         const game = JSON.parse(localStorage.getItem('game-' + game_id)) || {};
         const match = JSON.parse(localStorage.getItem('match-' + game_id)) || {};
         const prediction = JSON.parse(localStorage.getItem('prediction-' + game_id)) || {};
+        const new_game = localStorage.getItem('newgame-' + game_id) || "";
 
         // update state
         if (Object.keys(game).length === 0 || Object.keys(match).length === 0) {
@@ -66,6 +67,12 @@ class GameScoreboard extends React.Component {
             this.setState({prediction: prediction});
             this.openModal();
             localStorage.removeItem('prediction-' + game_id);
+        }
+
+        // redirect if a new game starts
+        if (new_game !== "") {
+            localStorage.removeItem('newgame-' + game_id);
+            window.location.href = '/game/' + new_game + '/scoreboard';
         }
     }
 
