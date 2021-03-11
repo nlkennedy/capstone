@@ -3,16 +3,27 @@ from django.http.response import StreamingHttpResponse
 from scoring_app.camera import VideoCamera
 from .models import Teams, Players, TeamMatches, Matches, Games
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 import json
 import re 
 import numpy as np
 import cv2
-
+from django.views import View
+import os
 from functools import reduce
 
 specialChars = re.compile('[@_!#$%^&*()<>?/\|}{~:=]')
+
+class Assets(View):
+    def get(self, _request, filename):
+        path = os.path.join(os.path.dirname(__file__), 'static', filename)
+
+        if os.path.isfile(path):
+            with open(path, 'rb') as file:
+                return HttpResponse(file.read(), content_type='application/javascript')
+        else:
+            return HttpResponseNotFound()
 
 def representsInt(s):
     try: 
