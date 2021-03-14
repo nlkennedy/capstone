@@ -312,6 +312,7 @@ def matches_summary(request):
                 match_summary.append(entry)
 
             data = json.dumps({
+                "pk": teammatch.pk,
                 "home_team_name": teammatch.home_team_id.team_name,
                 "away_team_name": teammatch.away_team_id.team_name,
                 "matches": match_summary

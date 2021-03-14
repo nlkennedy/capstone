@@ -135,7 +135,8 @@ class Matchup extends React.Component {
                     </div>
                 </div>
                 <footer className="footer">
-                        <a className="nav-link" href="/">Back to Home</a>
+                    <a className="nav-link" href={"/matchup/" + this.state.info.pk + "/summary"} rel="noreferrer" target="_blank">Match Summary View</a>
+                    <a className="nav-link" href="/">Back to Home</a>
                 </footer>
             </div>
         )
