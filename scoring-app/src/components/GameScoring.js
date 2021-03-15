@@ -15,6 +15,7 @@ class GameScoring extends React.Component {
                 team: "home", // or "away"
                 side: "R" // or "L"
             },
+            prev_point: "",
             webcamEnabled: false
         };
 
@@ -33,6 +34,7 @@ class GameScoring extends React.Component {
         this.updatePredictionState = this.updatePredictionState.bind(this);
         this.openWebcamModal = this.openWebcamModal.bind(this);
         this.closeWebcamModal = this.closeWebcamModal.bind(this);
+        this.handleUndo = this.handleUndo.bind(this);
     }
 
     componentDidMount() {
@@ -195,7 +197,10 @@ class GameScoring extends React.Component {
             }
         }
 
-        this.setState({ game: game });
+        this.setState({ 
+            game: game,
+            prev_point: team_score
+        });
 
         // update game in database 
         axiosInstance.patch(`api/games`, this.state.game)
@@ -203,6 +208,24 @@ class GameScoring extends React.Component {
         }, (error) => {
             console.log(error);
         });
+    }
+
+    // undos only one point at a time
+    handleUndo(e) {
+        const prev_point = this.state.prev_point;
+        const game = this.state.game;
+        const points = this.state.points;
+
+        points.pop();
+        game[prev_point] -= 1;
+        this.setState({
+            game: game,
+            points: points,
+            prev_point: ""
+        });
+
+        this.updatePointsState(game.game_id, points)
+        this.updateScoreboardState(game.game_id);
     }
 
     handleBeginNextGame(match_id, game_number, e) {
@@ -306,7 +329,7 @@ class GameScoring extends React.Component {
                                     <h4 className="shaded-gray">{this.state.match.home_team_name}</h4>
                                 </div>
                                 <div className="col-4 align-self-center">
-                                    <h6>Game {this.state.game.game_number}</h6>
+                                    <h6> {this.state.match.home_player_score} | {this.state.match.away_player_score} </h6>
                                 </div>
                                 <div className="col-4">
                                     <h4 className="shaded-gray">{this.state.match.away_team_name}</h4>
@@ -386,7 +409,12 @@ class GameScoring extends React.Component {
                                     <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("home", e)}>Referee Call</h5>
                                 </div>
                                 <div className="col-4">
-                                    <h5 className="shaded-red game-button">Undo</h5>
+                                    { this.state.prev_point !== "" && !this.state.game.done &&
+                                        <h5 className="shaded-red game-button" type="button" onClick={this.handleUndo}>Undo</h5>
+                                    }
+                                    { (this.state.prev_point === "" || this.state.game.done) &&
+                                        <h5 className="shaded-red-disabled game-button">Undo</h5>
+                                    }
                                 </div>
                                 <div className="col-4">
                                     <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("away", e)}>Referee Call</h5>

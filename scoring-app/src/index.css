@@ -101,6 +101,11 @@ code {
   padding: 2.5% 0%;
 }
 
+.shaded-red-disabled {
+  background-color: #d2b0ad;
+  padding: 2.5% 0%;
+}
+
 .shaded-blue {
   background-color: #474d65;
   padding: 5%;
