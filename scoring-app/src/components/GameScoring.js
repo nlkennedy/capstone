@@ -1,7 +1,7 @@
 import React from 'react';
-// import profile from '../images/person.jpg';
 import plus from '../images/plus.png';
 import axiosInstance from './axios';
+import Webcam from "react-webcam";
 
 class GameScoring extends React.Component {
     constructor(props) {
@@ -14,7 +14,9 @@ class GameScoring extends React.Component {
             selection: {
                 team: "home", // or "away"
                 side: "R" // or "L"
-            }
+            },
+            prev_point: "",
+            webcamEnabled: false
         };
 
         this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
@@ -26,6 +28,13 @@ class GameScoring extends React.Component {
         this.getInitialPointsState = this.getInitialPointsState.bind(this);
         this.removePointsState = this.removePointsState.bind(this);
         this.updatePointsState = this.updatePointsState.bind(this);
+        this.removeScoreboardState = this.removeScoreboardState.bind(this);
+        this.updateScoreboardState = this.updateScoreboardState.bind(this);
+        this.updateScoreboardLocation = this.updateScoreboardLocation.bind(this);
+        this.updatePredictionState = this.updatePredictionState.bind(this);
+        this.openWebcamModal = this.openWebcamModal.bind(this);
+        this.closeWebcamModal = this.closeWebcamModal.bind(this);
+        this.handleUndo = this.handleUndo.bind(this);
     }
 
     componentDidMount() {
@@ -46,12 +55,14 @@ class GameScoring extends React.Component {
             window.addEventListener('load', this.handleLoad);
             window.addEventListener("resize", this.updateDimensions);
             this.updateDimensions();
+            this.updateScoreboardState(game_id);
         });
     }
 
     componentWillUnmount() {
         window.removeEventListener('load', this.handleLoad);
         window.removeEventListener("resize", this.updateDimensions);
+        this.removeScoreboardState();
     }
 
     componentDidUpdate() {
@@ -70,6 +81,11 @@ class GameScoring extends React.Component {
         }
     }
 
+    // functions to deal with local storange for predictions
+    updatePredictionState(game_id, prediction) {
+        localStorage.setItem('prediction-' + game_id, JSON.stringify(prediction))
+    }
+
     // functions to deal with local storange for points
     getInitialPointsState(game_id) {
         return JSON.parse(localStorage.getItem('points-' + game_id)) || [];
@@ -80,8 +96,25 @@ class GameScoring extends React.Component {
     }
 
     updatePointsState(game_id, points) {
-        this.setState({ points: points});
+        this.setState({ points: points });
         localStorage.setItem('points-' + game_id, JSON.stringify(points));
+    }
+
+    // functions to deal with local storange for scoreboard state
+    removeScoreboardState() {
+        const game_id = this.state.game.game_id;
+        localStorage.removeItem('game-' + game_id);
+        localStorage.removeItem('match-' + game_id);
+    }
+
+    updateScoreboardState(game_id) {
+        localStorage.setItem('game-' + game_id, JSON.stringify(this.state.game));
+        localStorage.setItem('match-' + game_id, JSON.stringify(this.state.match));
+    }
+
+    updateScoreboardLocation(new_game) {
+        const game_id = this.state.game.game_id;
+        localStorage.setItem('newgame-' + game_id, new_game);
     }
 
     // returns the opposite selection
@@ -135,11 +168,13 @@ class GameScoring extends React.Component {
                 points.push(["", point])
             }
             this.updatePointsState(game.game_id, points)
+            this.updateScoreboardState(game.game_id);
 
             // check if game over and update done fields as necessary
             if (this.gameOver(game)) {
                 game.done = true; 
                 this.removePointsState(game.game_id);
+                this.removeScoreboardState(game.game_data);
 
                 // update match in database 
                 var match = this.state.match;
@@ -162,7 +197,10 @@ class GameScoring extends React.Component {
             }
         }
 
-        this.setState({ game: game });
+        this.setState({ 
+            game: game,
+            prev_point: team_score
+        });
 
         // update game in database 
         axiosInstance.patch(`api/games`, this.state.game)
@@ -170,6 +208,24 @@ class GameScoring extends React.Component {
         }, (error) => {
             console.log(error);
         });
+    }
+
+    // undos only one point at a time
+    handleUndo(e) {
+        const prev_point = this.state.prev_point;
+        const game = this.state.game;
+        const points = this.state.points;
+
+        points.pop();
+        game[prev_point] -= 1;
+        this.setState({
+            game: game,
+            points: points,
+            prev_point: ""
+        });
+
+        this.updatePointsState(game.game_id, points)
+        this.updateScoreboardState(game.game_id);
     }
 
     handleBeginNextGame(match_id, game_number, e) {
@@ -182,6 +238,7 @@ class GameScoring extends React.Component {
         axiosInstance.post(`api/games`, data)
             .then((res) => {
                 const game_id = res.data.game_id
+                this.updateScoreboardLocation(game_id);
                 window.location.href = '/game/' + game_id + '/scoring';
             }, (error) => {
                 console.log(error);
@@ -206,18 +263,60 @@ class GameScoring extends React.Component {
     }
 
     handleRefereeCall(team, e) {
-        // TODO for Radhika & Harsh
         console.log("The " + team + " team requests a referee call");
+        const game_id = this.state.game.game_id;
+        this.openWebcamModal();
 
-        axiosInstance.post(`predict.html`)
+        var keys = {
+            'let' : 'LET',
+            'nlt' : 'NO LET',
+            'str' : 'STROKE'  
+        };
+
+        axiosInstance.get(`video_feed`)
             .then((res) => {
-                console.log(res)
+                const prediction = {
+                    'call': keys[res.data.substr(res.data.length-3, res.data.length)],
+                    'team': this.state.match[team + "_team_name"]
+                };
+
+                var toDisplay = 'Here is your prediction: ' + prediction.call + '\n\nPlease select OK if the prediction looks correct. Otherwise, press cancel and input your prediction again.';
+                if (window.confirm(toDisplay)) {
+                  this.updatePredictionState(game_id, prediction);
+                  this.closeWebcamModal();
+                }
+                else {
+                    this.handleRefereeCall(team, e);
+                }
             }, (error) => {
                 console.log(error);
             });
     }
 
+    openWebcamModal() {
+        this.setState(
+            { webcamEnabled: true }, 
+            () => {
+                document.getElementById("backdrop").style.display = "block";
+                document.getElementById("webcamModal").style.display = "block";
+                document.getElementById("webcamModal").className += "show";
+            }
+        );
+    }
+
+    closeWebcamModal() {
+        document.getElementById("backdrop").style.display = "none";
+        document.getElementById("webcamModal").style.display = "none";
+        document.getElementById("webcamModal").className += document.getElementById("webcamModal").className.replace("show", "");
+        this.setState({ webcamEnabled: false })
+    }
+
     render() {
+        const videoConstraints = {
+            width: 1280,
+            height: 720,
+            aspectRatio: 1
+        };
         return (
             <div>
                 <div id="wrap">
@@ -230,7 +329,7 @@ class GameScoring extends React.Component {
                                     <h4 className="shaded-gray">{this.state.match.home_team_name}</h4>
                                 </div>
                                 <div className="col-4 align-self-center">
-                                    <h6>Game {this.state.game.game_number}</h6>
+                                    <h6> {this.state.match.home_player_score} | {this.state.match.away_player_score} </h6>
                                 </div>
                                 <div className="col-4">
                                     <h4 className="shaded-gray">{this.state.match.away_team_name}</h4>
@@ -310,7 +409,12 @@ class GameScoring extends React.Component {
                                     <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("home", e)}>Referee Call</h5>
                                 </div>
                                 <div className="col-4">
-                                    <h5 className="shaded-red game-button">Undo</h5>
+                                    { this.state.prev_point !== "" && !this.state.game.done &&
+                                        <h5 className="shaded-red game-button" type="button" onClick={this.handleUndo}>Undo</h5>
+                                    }
+                                    { (this.state.prev_point === "" || this.state.game.done) &&
+                                        <h5 className="shaded-red-disabled game-button">Undo</h5>
+                                    }
                                 </div>
                                 <div className="col-4">
                                     <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("away", e)}>Referee Call</h5>
@@ -327,8 +431,38 @@ class GameScoring extends React.Component {
                     </div>
                 </div>
                 <footer className="footer">
+                    <a className="nav-link" href={"/game/" + this.state.game.game_id + "/scoreboard"} rel="noreferrer" target="_blank">Scoreboard View</a>
                     <a className="nav-link" href={"/matchup/" + this.state.match.team_match_id}>Back to Team Matchup</a>
                 </footer>
+
+                { this.state.webcamEnabled &&
+                    <div className="modal fade" id="webcamModal" tabIndex="-1" aria-labelledby="webcamModalLabel" aria-modal="true"
+                        role="dialog">
+                        <div className="modal-dialog modal-lg" role="document">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title" id="webcamModalLabel">
+                                        Generating prediction!
+                                    </h5>
+                                    <button type="button" className="close" aria-label="Close" onClick={this.closeWebcamModal}>
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="text-center scoreboard">
+                                        <Webcam 
+                                            videoConstraints={videoConstraints} 
+                                            audio={false}
+                                            mirrored={true}
+                                            style={{width: '100%'}}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div className="modal-backdrop fade show" id="backdrop" style={{ display: 'none'}} ></div>
             </div>
         )
     }

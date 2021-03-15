@@ -5,16 +5,18 @@ class CreateMatchup extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // change default to "" when finished testing 
+            // change default to '' when finished testing 
             homeTeam: "Tufts",
             awayTeam: "Bowdoin",
-            homePlayers: ["homeA", "homeB", "homeC", "homeD", "homeE", "homeF", "homeG", "homeH", "homeI"], //Array(9).fill(""),
-            awayPlayers: ["awayA", "awayB", "awayC", "awayD", "awayE", "awayF", "awayG", "awayH", "awayI"], //Array(9).fill(""),
-            courts: [1, 2, 3, 4, 5, 6, 7, 8, 9] // Array(9).fill("")
+            homePlayers: ["homeA", "homeB", "homeC", "homeD", "homeE", "homeF", "homeG", "homeH", "homeI"], //Array(9).fill(''),
+            awayPlayers: ["awayA", "awayB", "awayC", "awayD", "awayE", "awayF", "awayG", "awayH", "awayI"], //Array(9).fill(''),
+            courts: [1, 2, 3, 4, 5, 6, 7, 8, 9] // Array(9).fill('')
         };
     
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleTitleInputChange = this.handleTitleInputChange.bind(this);
+        this.openValidationModal = this.openValidationModal.bind(this);
+        this.closeValidationModal = this.closeValidationModal.bind(this);
     }
 
     handleTitleInputChange(event) {
@@ -44,26 +46,38 @@ class CreateMatchup extends React.Component {
 
     handleSubmit = event => {
         event.preventDefault();
-        // add type checking and make sure all fields are filled 
-        // Check inputs for special characters and don't allow to be submitted
+
+        // form validation: all fields are required and special characters are not allowed
         var specialChars = /[^a-zA-Z0-9 ]/g;
-        //var non_nums = /[^0-9.]/g;
+        // validate team names
         if (this.state.homeTeam.match(specialChars) || this.state.awayTeam.match(specialChars)) {
-            alert('Only characters A-Z, a-z and 0-9, are allowed.')
-            return
+            this.openValidationModal('Only characters A-Z, a-z and 0-9, are allowed.')
+            return;
         }
+
+        if (this.state.homeTeam === '' || this.state.awayTeam === '') {
+            this.openValidationModal('All fields are required.');
+            return;
+        }
+
+        // validate homePlayers, awayPlayers, courts
         for (var j = 0; j < 9; j++) {
+            if (this.state.homePlayers[j] === '' || this.state.awayPlayers[j] === '' || this.state.courts[j] === '') {
+                this.openValidationModal('All fields are required.')
+                return;
+            }
+
             if (this.state.homePlayers[j].match(specialChars) || this.state.awayPlayers[j].match(specialChars)) {
-                    alert('Only characters A-Z, a-z and 0-9, are allowed.')
-                    return
-                }
-            if (!Number.isInteger(this.state.courts[j])) {
-                    alert('Court number must be an integer.')
-                    this.state.courts[j] = j+1
-                    return
+                this.openValidationModal('Only characters A-Z, a-z and 0-9, are allowed.');
+                return;
+            }
+
+            if (!Number.isInteger(+this.state.courts[j])) {
+                this.openValidationModal('Court number must be an integer.')
+                return;
             }
         }
-      
+
         // condense data 
         var matches = [];
         for (var i = 0; i < 9; i++) {
@@ -91,6 +105,19 @@ class CreateMatchup extends React.Component {
                 console.log(error);
             });
       }
+
+    openValidationModal(message) {
+        this.setState({ validationMessage: message });
+        document.getElementById("backdrop").style.display = "block";
+        document.getElementById("validationModal").style.display = "block";
+        document.getElementById("validationModal").className += "show";
+    }
+
+     closeValidationModal() {
+        document.getElementById("backdrop").style.display = "none";
+        document.getElementById("validationModal").style.display = "none";
+        document.getElementById("validationModal").className += document.getElementById("validationModal").className.replace("show", "");
+    }
 
     render() {
         const team_match_length = 9;
@@ -169,9 +196,29 @@ class CreateMatchup extends React.Component {
                     <div style={{ marginTop: '2%', marginBottom: '2%' }}>
                         <button type="submit" className="btn btn-secondary">Create</button>
                     </div>
-                    
                 </form>
 
+                <div className="modal fade" id="validationModal" tabIndex="-1" aria-labelledby="validationModalLabel" aria-modal="true" role="dialog">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title" id="validationModalLabel">
+                                    Please review your submission. 
+                                </h5>
+                                <button type="button" className="close" aria-label="Close" onClick={this.closeValidationModal}>
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div className="modal-body text-left">
+                                {this.state.validationMessage}
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={this.closeValidationModal}>OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal-backdrop fade show" id="backdrop" style={{ display: 'none'}} ></div>
             </div>
         )
     }
