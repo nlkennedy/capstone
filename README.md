@@ -29,7 +29,7 @@ To run frontend and backend separately for development:
 * In `/scoring-app/src/components/axios.js`, make sure the `baseURL` corresponds to the correct server
 
 ### Creating Frontend Build to Serve
-This must be done before every deploy to see the new changes. 
+This must be done before every deploy and `heroku local web` run to see the new changes. 
 1. Delete the `build` folder. 
 2. Delete the `staticfiles` folder. 
 3. Run `yarn build`. 
