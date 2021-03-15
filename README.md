@@ -28,7 +28,8 @@ To run frontend and backend separately for development:
 * Go to http://localhost:3000 (or whatever port is used)
 * In `/scoring-app/src/components/axios.js`, make sure the `baseURL` corresponds to the correct server
 
-### Making Frontend Changes Locally
+### Creating Frontend Build to Serve
+This must be done before every deploy to see the new changes. 
 1. Delete the `build` folder. 
 2. Delete the `staticfiles` folder. 
 3. Run `yarn build`. 
