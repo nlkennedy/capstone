@@ -72,12 +72,10 @@ def gen(camera):
     print('done with gen')
     return 'Hi!!'
 
+@csrf_exempt
 def video_feed(request):
     result = StreamingHttpResponse(gen(VideoCamera()),
                 content_type='multipart/x-mixed-replace; boundary=frame')
-    # if done:
-    #     result = HttpResponse("HELLO")
-
     return result
 
 @csrf_exempt

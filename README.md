@@ -21,12 +21,13 @@ This app is a squash game scoring app originally built for the Tufts Squash team
 ### Run Project on Local Machine
 * `heroku local web`
 * Go to http://localhost:5000 (or whatever port is used)
+* This uses the frontend build of static files, so make sure those are updated (see bullet below)
 
 To run frontend and backend separately for development:
 * Frontend: `cd scoring-app && yarn start`
 * Backend: `python3 manage.py runserver`
 * Go to http://localhost:3000 (or whatever port is used)
-* In `/scoring-app/src/components/axios.js`, make sure the `baseURL` corresponds to the correct server
+* In `/scoring-app/src/components/axios.js`, make sure the `baseURL` corresponds to the correct server (local backend: http://localhost:5000)
 
 ### Creating Frontend Build to Serve
 This must be done before every deploy and `heroku local web` run to see the new changes. 
