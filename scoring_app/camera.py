@@ -15,7 +15,7 @@ print("Loaded model from disk")
 
 class VideoCamera(object):
     def __init__(self):
-        self.video = cv2.VideoCapture(0)
+        self.video = cv2.VideoCapture(-1)
 
     def __del__(self):
         self.video.release()
@@ -47,13 +47,13 @@ class VideoCamera(object):
         ret, frame = self.video.read()
 
         # smoothing filter
-        updated_frame = cv2.bilateralFilter(frame, 5, 50, 100)
+        frame = cv2.bilateralFilter(frame, 5, 50, 100)
         # flip frame horizontally
-        updated_frame = cv2.flip(updated_frame, 1)
-        cv2.rectangle(updated_frame, (int(0.5 * updated_frame.shape[1]), 0),
-                      (updated_frame.shape[1], int(0.8 * updated_frame.shape[0])), (255, 0, 0), 2)
-        cv2.putText(updated_frame, f"Prediction: {signals_translated[prediction]}", (10, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
-        cv2.putText(updated_frame, f"Actual: {prediction}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)
+        frame = cv2.flip(frame, 1)
+        cv2.rectangle(frame, (int(0.5 * frame.shape[1]), 0),
+                      (frame.shape[1], int(0.8 * frame.shape[0])), (255, 0, 0), 2)
+        cv2.putText(frame, f"Prediction: {signals_translated[prediction]}", (10, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
+        cv2.putText(frame, f"Actual: {prediction}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)
         
         if not(check):
             print('taking background image once?')
@@ -66,9 +66,9 @@ class VideoCamera(object):
         
         if isBgCaptured == 1:
             print("Background is captured")
-            img = remove_background(updated_frame)
-            img = img[0:int(0.8 * updated_frame.shape[0]),
-                  int(0.5 * updated_frame.shape[1]):updated_frame.shape[1]]
+            img = remove_background(frame)
+            img = img[0:int(0.8 * frame.shape[0]),
+                  int(0.5 * frame.shape[1]):frame.shape[1]]
             print(img.shape)
             # do the processing after capturing the image
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -104,21 +104,21 @@ class VideoCamera(object):
             # video stream.
             if (proper_prediction == True):
                 print('Good result!')
-                cv2.putText(updated_frame, f"Prediction: {signals_translated[prediction]}", (10, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
-                cv2.putText(updated_frame, f"Actual: {prediction}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1) 
-                cv2.putText(updated_frame, prediction[0][0], (30, 120), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
-                ret, jpeg = cv2.imencode('.jpg', updated_frame)
+                cv2.putText(frame, f"Prediction: {signals_translated[prediction]}", (10, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
+                cv2.putText(frame, f"Actual: {prediction}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1) 
+                cv2.putText(frame, prediction[0][0], (30, 120), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
+                ret, jpeg = cv2.imencode('.jpg', frame)
                 print('COUNTER ')
                 print(counter)
                 for i in counter.values():
                     if i >= 15:
                         return -1, counter, check, bgModel
-                ret, jpeg = cv2.imencode('.jpg', updated_frame)
+                ret, jpeg = cv2.imencode('.jpg', frame)
                 return jpeg.tobytes(), counter, check, bgModel
             else:
                 print('Bad result!')
-                ret, jpeg = cv2.imencode('.jpg', updated_frame)
+                ret, jpeg = cv2.imencode('.jpg', frame)
                 return jpeg.tobytes(), counter, check, bgModel
                     
-        ret, jpeg = cv2.imencode('.jpg', updated_frame)
+        ret, jpeg = cv2.imencode('.jpg', frame)
         return jpeg.tobytes(), counter, check, bgModel

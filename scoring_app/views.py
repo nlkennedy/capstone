@@ -58,11 +58,7 @@ def gen(camera):
 
     while True:
         print('calling get frame')
-        try: 
-            frame, counter, check, bgModel = camera.get_frame(counter, check, bgModel)
-        except: 
-            print("bilateral failure")
-            continue
+        frame, counter, check, bgModel = camera.get_frame(counter, check, bgModel)
         if frame == -1:
             counter = dict(sorted(counter.items(), key=lambda item: item[1]))
             print('sorted ', counter)
