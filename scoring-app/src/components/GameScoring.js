@@ -1,7 +1,7 @@
 import React from 'react';
 import plus from '../images/plus.png';
 import axiosInstance from './axios';
-import Webcam from "react-webcam";
+import Webcam from 'react-webcam';
 
 class GameScoring extends React.Component {
     constructor(props) {
@@ -12,11 +12,11 @@ class GameScoring extends React.Component {
             match_done: false,
             points: [], // entries are [home_point_selection, away_point_selection]
             selection: {
-                team: "home", // or "away"
-                side: "R" // or "L"
+                team: 'home', // or "away"
+                side: 'R', // or "L"
             },
-            prev_point: "",
-            webcamEnabled: false
+            prev_point: '',
+            webcamEnabled: false,
         };
 
         this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
@@ -30,7 +30,9 @@ class GameScoring extends React.Component {
         this.updatePointsState = this.updatePointsState.bind(this);
         this.removeScoreboardState = this.removeScoreboardState.bind(this);
         this.updateScoreboardState = this.updateScoreboardState.bind(this);
-        this.updateScoreboardLocation = this.updateScoreboardLocation.bind(this);
+        this.updateScoreboardLocation = this.updateScoreboardLocation.bind(
+            this
+        );
         this.updatePredictionState = this.updatePredictionState.bind(this);
         this.openWebcamModal = this.openWebcamModal.bind(this);
         this.closeWebcamModal = this.closeWebcamModal.bind(this);
@@ -39,29 +41,30 @@ class GameScoring extends React.Component {
 
     componentDidMount() {
         const game_id = window.location.pathname.split('/')[2];
-        axiosInstance.get(`api/games`, {
-            params: {
-                game_id: game_id
-            }
-        })
-        .then(res => {
-            const data = res.data;
-            this.setState({
-                game: data.game_data, 
-                match: data.match_data,
-                points: this.getInitialPointsState(game_id)
+        axiosInstance
+            .get(`api/games`, {
+                params: {
+                    game_id: game_id,
+                },
+            })
+            .then((res) => {
+                const data = res.data;
+                this.setState({
+                    game: data.game_data,
+                    match: data.match_data,
+                    points: this.getInitialPointsState(game_id),
+                });
+
+                window.addEventListener('load', this.handleLoad);
+                window.addEventListener('resize', this.updateDimensions);
+                this.updateDimensions();
+                this.updateScoreboardState(game_id);
             });
-            
-            window.addEventListener('load', this.handleLoad);
-            window.addEventListener("resize", this.updateDimensions);
-            this.updateDimensions();
-            this.updateScoreboardState(game_id);
-        });
     }
 
     componentWillUnmount() {
         window.removeEventListener('load', this.handleLoad);
-        window.removeEventListener("resize", this.updateDimensions);
+        window.removeEventListener('resize', this.updateDimensions);
         this.removeScoreboardState();
     }
 
@@ -74,16 +77,20 @@ class GameScoring extends React.Component {
     }
 
     updateDimensions() {
-        document.getElementById("scrollable").style["height"] = 0 + "px";
-        const target_height = document.getElementById("target").clientHeight;
+        document.getElementById('scrollable').style['height'] = 0 + 'px';
+        const target_height = document.getElementById('target').clientHeight;
         if (target_height < 400) {
-            document.getElementById("scrollable").style["height"] = target_height + "px";
+            document.getElementById('scrollable').style['height'] =
+                target_height + 'px';
         }
     }
 
     // functions to deal with local storange for predictions
     updatePredictionState(game_id, prediction) {
-        localStorage.setItem('prediction-' + game_id, JSON.stringify(prediction))
+        localStorage.setItem(
+            'prediction-' + game_id,
+            JSON.stringify(prediction)
+        );
     }
 
     // functions to deal with local storange for points
@@ -108,8 +115,14 @@ class GameScoring extends React.Component {
     }
 
     updateScoreboardState(game_id) {
-        localStorage.setItem('game-' + game_id, JSON.stringify(this.state.game));
-        localStorage.setItem('match-' + game_id, JSON.stringify(this.state.match));
+        localStorage.setItem(
+            'game-' + game_id,
+            JSON.stringify(this.state.game)
+        );
+        localStorage.setItem(
+            'match-' + game_id,
+            JSON.stringify(this.state.match)
+        );
     }
 
     updateScoreboardLocation(new_game) {
@@ -119,14 +132,14 @@ class GameScoring extends React.Component {
 
     // returns the opposite selection
     not(selection) {
-        if (selection === "R") {
-            return "L";
-        } else if (selection === "L") {
-            return "R";
-        } else if (selection === "home") {
-            return "away";
-        } else if (selection === "away") {
-            return "home";
+        if (selection === 'R') {
+            return 'L';
+        } else if (selection === 'L') {
+            return 'R';
+        } else if (selection === 'home') {
+            return 'away';
+        } else if (selection === 'away') {
+            return 'home';
         }
     }
 
@@ -138,14 +151,18 @@ class GameScoring extends React.Component {
             selection.side = 'R'; // default to right side
             selection.team = this.not(selection.team);
         }
-        const id = selection.team + "-" + selection.side;
+        const id = selection.team + '-' + selection.side;
         this.updateServeButtons(id);
-        this.setState({ selection: selection })
+        this.setState({ selection: selection });
     }
 
     gameOver(game) {
-        const win_by_two = Math.abs(game.home_player_score - game.away_player_score) >= 2;
-        return ((game.home_player_score >= 11) || (game.away_player_score >= 11)) && (win_by_two);
+        const win_by_two =
+            Math.abs(game.home_player_score - game.away_player_score) >= 2;
+        return (
+            (game.home_player_score >= 11 || game.away_player_score >= 11) &&
+            win_by_two
+        );
     }
 
     handleScorePlusOne(team_score, e) {
@@ -159,55 +176,62 @@ class GameScoring extends React.Component {
             // log serve & point
             var team = team_score.split('_')[0];
             this.updateSelection(team);
-            
+
             const point = game[team_score] + this.state.selection.side;
             var points = this.state.points;
-            if (team === "home") {
-                points.push([point, ""])
+            if (team === 'home') {
+                points.push([point, '']);
             } else {
-                points.push(["", point])
+                points.push(['', point]);
             }
-            this.updatePointsState(game.game_id, points)
+            this.updatePointsState(game.game_id, points);
             this.updateScoreboardState(game.game_id);
 
             // check if game over and update done fields as necessary
             if (this.gameOver(game)) {
-                game.done = true; 
+                game.done = true;
                 this.removePointsState(game.game_id);
                 this.removeScoreboardState(game.game_data);
 
-                // update match in database 
+                // update match in database
                 var match = this.state.match;
-                const game_winner = game.home_player_score > game.away_player_score ? 'home_player_score' : 'away_player_score';
+                const game_winner =
+                    game.home_player_score > game.away_player_score
+                        ? 'home_player_score'
+                        : 'away_player_score';
                 match[game_winner] += 1;
-                const match_winner = (match.home_player_score >= 3) || (match.away_player_score >= 3);
+                const match_winner =
+                    match.home_player_score >= 3 ||
+                    match.away_player_score >= 3;
                 if (match_winner) {
                     match.done = true;
                 }
-                this.setState({ 
+                this.setState({
                     match: match,
                     match_done: true,
                 });
 
-                axiosInstance.patch(`api/matches`, match)
-                    .then((res) => {
-                    }, (error) => {
+                axiosInstance.patch(`api/matches`, match).then(
+                    (res) => {},
+                    (error) => {
                         console.log(error);
-                    });
+                    }
+                );
             }
         }
 
-        this.setState({ 
+        this.setState({
             game: game,
-            prev_point: team_score
+            prev_point: team_score,
         });
 
-        // update game in database 
-        axiosInstance.patch(`api/games`, this.state.game)
-        .then((res) => {
-        }, (error) => {
-            console.log(error);
-        });
+        // update game in database
+        axiosInstance.patch(`api/games`, this.state.game).then(
+            (res) => {},
+            (error) => {
+                console.log(error);
+            }
+        );
     }
 
     // undos only one point at a time
@@ -221,32 +245,34 @@ class GameScoring extends React.Component {
         this.setState({
             game: game,
             points: points,
-            prev_point: ""
+            prev_point: '',
         });
 
-        this.updatePointsState(game.game_id, points)
+        this.updatePointsState(game.game_id, points);
         this.updateScoreboardState(game.game_id);
     }
 
     handleBeginNextGame(match_id, game_number, e) {
         e.preventDefault();
         const data = {
-            'match_id': match_id,
-            'game_number': game_number
-        }
+            match_id: match_id,
+            game_number: game_number,
+        };
 
-        axiosInstance.post(`api/games`, data)
-            .then((res) => {
-                const game_id = res.data.game_id
+        axiosInstance.post(`api/games`, data).then(
+            (res) => {
+                const game_id = res.data.game_id;
                 this.updateScoreboardLocation(game_id);
                 window.location.href = '/game/' + game_id + '/scoring';
-            }, (error) => {
+            },
+            (error) => {
                 console.log(error);
-            });
+            }
+        );
     }
 
     updateServeButtons(id) {
-        var buttons = document.getElementsByClassName("serve-change");
+        var buttons = document.getElementsByClassName('serve-change');
         for (var i = 0; i < buttons.length; i++) {
             buttons[i].classList.remove('shaded-blue');
         }
@@ -254,99 +280,131 @@ class GameScoring extends React.Component {
     }
 
     handleServeChange(e) {
-        const id = e.target.id.split("-");
+        const id = e.target.id.split('-');
         var selection = this.state.selection;
         selection.team = id[0];
         selection.side = id[1];
         this.setState({ selection: selection });
-        this.updateServeButtons(e.target.id)
+        this.updateServeButtons(e.target.id);
     }
 
     handleRefereeCall(team, e) {
-        console.log("The " + team + " team requests a referee call");
+        console.log('The ' + team + ' team requests a referee call');
         const game_id = this.state.game.game_id;
         this.openWebcamModal();
 
         var keys = {
-            'let' : 'LET',
-            'nlt' : 'NO LET',
-            'str' : 'STROKE'  
+            let: 'LET',
+            nlt: 'NO LET',
+            str: 'STROKE',
         };
 
-        axiosInstance.get(`video_feed`)
-            .then((res) => {
+        axiosInstance.get(`video_feed`).then(
+            (res) => {
                 const prediction = {
-                    'call': keys[res.data.substr(res.data.length-3, res.data.length)],
-                    'team': this.state.match[team + "_team_name"]
+                    call:
+                        keys[
+                            res.data.substr(
+                                res.data.length - 3,
+                                res.data.length
+                            )
+                        ],
+                    team: this.state.match[team + '_team_name'],
                 };
 
-                var toDisplay = 'Here is your prediction: ' + prediction.call + '\n\nPlease select OK if the prediction looks correct. Otherwise, press cancel and input your prediction again.';
+                var toDisplay =
+                    'Here is your prediction: ' +
+                    prediction.call +
+                    '\n\nPlease select OK if the prediction looks correct. Otherwise, press cancel and input your prediction again.';
                 if (window.confirm(toDisplay)) {
-                  this.updatePredictionState(game_id, prediction);
-                  this.closeWebcamModal();
-                }
-                else {
+                    this.updatePredictionState(game_id, prediction);
+                    this.closeWebcamModal();
+                } else {
                     this.handleRefereeCall(team, e);
                 }
-            }, (error) => {
+            },
+            (error) => {
                 console.log(error);
-            });
-    }
-
-    openWebcamModal() {
-        this.setState(
-            { webcamEnabled: true }, 
-            () => {
-                document.getElementById("backdrop").style.display = "block";
-                document.getElementById("webcamModal").style.display = "block";
-                document.getElementById("webcamModal").className += "show";
             }
         );
     }
 
+    openWebcamModal() {
+        this.setState({ webcamEnabled: true }, () => {
+            document.getElementById('backdrop').style.display = 'block';
+            document.getElementById('webcamModal').style.display = 'block';
+            document.getElementById('webcamModal').className += 'show';
+        });
+    }
+
     closeWebcamModal() {
-        document.getElementById("backdrop").style.display = "none";
-        document.getElementById("webcamModal").style.display = "none";
-        document.getElementById("webcamModal").className += document.getElementById("webcamModal").className.replace("show", "");
-        this.setState({ webcamEnabled: false })
+        document.getElementById('backdrop').style.display = 'none';
+        document.getElementById('webcamModal').style.display = 'none';
+        document.getElementById(
+            'webcamModal'
+        ).className += document
+            .getElementById('webcamModal')
+            .className.replace('show', '');
+        this.setState({ webcamEnabled: false });
     }
 
     render() {
         const videoConstraints = {
             width: 1280,
             height: 720,
-            aspectRatio: 1
+            aspectRatio: 1,
         };
         return (
             <div>
                 <div id="wrap">
                     <div id="main" className="container">
-                        <h1 style={{ marginTop: '5%', marginBottom: '5%' }}>Game Scoring</h1>
+                        <h1 style={{ marginTop: '5%', marginBottom: '5%' }}>
+                            Game Scoring
+                        </h1>
 
-                        <div className="container" style={{ paddingRight: '10%', paddingLeft: '10%' }}>
+                        <div
+                            className="container"
+                            style={{ paddingRight: '10%', paddingLeft: '10%' }}
+                        >
                             <div className="row">
                                 <div className="col-4">
-                                    <h4 className="shaded-gray">{this.state.match.home_team_name}</h4>
+                                    <h4 className="shaded-gray">
+                                        {this.state.match.home_team_name}
+                                    </h4>
                                 </div>
                                 <div className="col-4 align-self-center">
-                                    <h6> {this.state.match.home_player_score} | {this.state.match.away_player_score} </h6>
+                                    <h6>
+                                        {' '}
+                                        {
+                                            this.state.match.home_player_score
+                                        } | {this.state.match.away_player_score}{' '}
+                                    </h6>
                                 </div>
                                 <div className="col-4">
-                                    <h4 className="shaded-gray">{this.state.match.away_team_name}</h4>
+                                    <h4 className="shaded-gray">
+                                        {this.state.match.away_team_name}
+                                    </h4>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col-4">
                                     <h5 className="shaded-gray">
-                                        <span>{this.state.match.home_player_name}</span>
+                                        <span>
+                                            {this.state.match.home_player_name}
+                                        </span>
                                     </h5>
                                 </div>
                                 <div className="col-4 align-self-center">
-                                    <h1>{this.state.game.home_player_score} | {this.state.game.away_player_score}</h1>
+                                    <h1>
+                                        {this.state.game.home_player_score} |{' '}
+                                        {this.state.game.away_player_score}
+                                    </h1>
                                 </div>
                                 <div className="col-4">
                                     <h5 className="shaded-gray">
-                                        <span>{this.state.match.away_player_name}</span>
+                                        <span>
+                                            {this.state.match.away_player_name}
+                                        </span>
                                     </h5>
                                 </div>
                             </div>
@@ -354,31 +412,66 @@ class GameScoring extends React.Component {
                                 <div id="target" className="col-4">
                                     <div className="row">
                                         <div className="col-12">
-                                            <button className="shaded-gray" onClick={(e) => this.handleScorePlusOne("home_player_score", e)}>
-                                                <img src={plus} className="img-fluid w-75" alt="" />
+                                            <button
+                                                className="shaded-gray"
+                                                onClick={(e) =>
+                                                    this.handleScorePlusOne(
+                                                        'home_player_score',
+                                                        e
+                                                    )
+                                                }
+                                            >
+                                                <img
+                                                    src={plus}
+                                                    className="img-fluid w-75"
+                                                    alt=""
+                                                />
                                             </button>
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="col-12">
-                                            <h3 id="home-L" className="serve-change game-button" type="button" onClick={this.handleServeChange}>L</h3>
+                                            <h3
+                                                id="home-L"
+                                                className="serve-change game-button"
+                                                type="button"
+                                                onClick={this.handleServeChange}
+                                            >
+                                                L
+                                            </h3>
                                         </div>
                                     </div>
                                     <div className="row">
-                                        <div className="col-12"> 
-                                            <h3 id="home-R" className="serve-change game-button shaded-blue" type="button" onClick={this.handleServeChange}>R</h3>
+                                        <div className="col-12">
+                                            <h3
+                                                id="home-R"
+                                                className="serve-change game-button shaded-blue"
+                                                type="button"
+                                                onClick={this.handleServeChange}
+                                            >
+                                                R
+                                            </h3>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-4">
-                                    <div id="scrollable" className="scrollable"> 
+                                    <div id="scrollable" className="scrollable">
                                         <div className="container">
                                             <h5>
-                                                { this.state.points.map((point, i) => 
-                                                    <div key={"point-" + i} className="row">
-                                                        <div className="col-6 text-right">{point[0]}</div>
-                                                        <div className="col-6 text-left">{point[1]}</div>
-                                                    </div>
+                                                {this.state.points.map(
+                                                    (point, i) => (
+                                                        <div
+                                                            key={'point-' + i}
+                                                            className="row"
+                                                        >
+                                                            <div className="col-6 text-right">
+                                                                {point[0]}
+                                                            </div>
+                                                            <div className="col-6 text-left">
+                                                                {point[1]}
+                                                            </div>
+                                                        </div>
+                                                    )
                                                 )}
                                             </h5>
                                         </div>
@@ -387,84 +480,185 @@ class GameScoring extends React.Component {
                                 <div className="col-4">
                                     <div className="row">
                                         <div className="col-12">
-                                            <button className="shaded-gray" onClick={(e) => this.handleScorePlusOne("away_player_score", e)}>
-                                                <img src={plus} className="img-fluid w-75" alt="" />
+                                            <button
+                                                className="shaded-gray"
+                                                onClick={(e) =>
+                                                    this.handleScorePlusOne(
+                                                        'away_player_score',
+                                                        e
+                                                    )
+                                                }
+                                            >
+                                                <img
+                                                    src={plus}
+                                                    className="img-fluid w-75"
+                                                    alt=""
+                                                />
                                             </button>
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="col-12">
-                                            <h3 id="away-L" className="serve-change game-button" type="button" onClick={this.handleServeChange}>L</h3>
+                                            <h3
+                                                id="away-L"
+                                                className="serve-change game-button"
+                                                type="button"
+                                                onClick={this.handleServeChange}
+                                            >
+                                                L
+                                            </h3>
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="col-12">
-                                            <h3 id="away-R" className="serve-change game-button" type="button" onClick={this.handleServeChange}>R</h3>
+                                            <h3
+                                                id="away-R"
+                                                className="serve-change game-button"
+                                                type="button"
+                                                onClick={this.handleServeChange}
+                                            >
+                                                R
+                                            </h3>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col-4">
-                                    <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("home", e)}>Referee Call</h5>
+                                    <h5
+                                        className="shaded-orange"
+                                        type="button"
+                                        onClick={(e) =>
+                                            this.handleRefereeCall('home', e)
+                                        }
+                                    >
+                                        Referee Call
+                                    </h5>
                                 </div>
                                 <div className="col-4">
-                                    { this.state.prev_point !== "" && !this.state.game.done &&
-                                        <h5 className="shaded-red game-button" type="button" onClick={this.handleUndo}>Undo</h5>
-                                    }
-                                    { (this.state.prev_point === "" || this.state.game.done) &&
-                                        <h5 className="shaded-red-disabled game-button">Undo</h5>
-                                    }
+                                    {this.state.prev_point !== '' &&
+                                        !this.state.game.done && (
+                                            <h5
+                                                className="shaded-red game-button"
+                                                type="button"
+                                                onClick={this.handleUndo}
+                                            >
+                                                Undo
+                                            </h5>
+                                        )}
+                                    {(this.state.prev_point === '' ||
+                                        this.state.game.done) && (
+                                        <h5 className="shaded-red-disabled game-button">
+                                            Undo
+                                        </h5>
+                                    )}
                                 </div>
                                 <div className="col-4">
-                                    <h5 className="shaded-orange" type="button" onClick={(e) => this.handleRefereeCall("away", e)}>Referee Call</h5>
+                                    <h5
+                                        className="shaded-orange"
+                                        type="button"
+                                        onClick={(e) =>
+                                            this.handleRefereeCall('away', e)
+                                        }
+                                    >
+                                        Referee Call
+                                    </h5>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col-12">
-                                    { this.state.game.done && !this.state.match.done && 
-                                        <button type="button" className="btn btn-secondary btn-block btn-lg" onClick={(e) => this.handleBeginNextGame(this.state.match.match_id, this.state.game.game_number + 1, e)}>START GAME #{this.state.game.game_number + 1}</button>
-                                    }
+                                    {this.state.game.done &&
+                                        !this.state.match.done && (
+                                            <button
+                                                type="button"
+                                                className="btn btn-secondary btn-block btn-lg"
+                                                onClick={(e) =>
+                                                    this.handleBeginNextGame(
+                                                        this.state.match
+                                                            .match_id,
+                                                        this.state.game
+                                                            .game_number + 1,
+                                                        e
+                                                    )
+                                                }
+                                            >
+                                                START GAME #
+                                                {this.state.game.game_number +
+                                                    1}
+                                            </button>
+                                        )}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <footer className="footer">
-                    <a className="nav-link" href={"/game/" + this.state.game.game_id + "/scoreboard"} rel="noreferrer" target="_blank">Scoreboard View</a>
-                    <a className="nav-link" href={"/matchup/" + this.state.match.team_match_id}>Back to Team Matchup</a>
+                    <a
+                        className="nav-link"
+                        href={
+                            '/game/' + this.state.game.game_id + '/scoreboard'
+                        }
+                        rel="noreferrer"
+                        target="_blank"
+                    >
+                        Scoreboard View
+                    </a>
+                    <a
+                        className="nav-link"
+                        href={'/matchup/' + this.state.match.team_match_id}
+                    >
+                        Back to Team Matchup
+                    </a>
                 </footer>
 
-                { this.state.webcamEnabled &&
-                    <div className="modal fade" id="webcamModal" tabIndex="-1" aria-labelledby="webcamModalLabel" aria-modal="true"
-                        role="dialog">
+                {this.state.webcamEnabled && (
+                    <div
+                        className="modal fade"
+                        id="webcamModal"
+                        tabIndex="-1"
+                        aria-labelledby="webcamModalLabel"
+                        aria-modal="true"
+                        role="dialog"
+                    >
                         <div className="modal-dialog modal-lg" role="document">
                             <div className="modal-content">
                                 <div className="modal-header">
-                                    <h5 className="modal-title" id="webcamModalLabel">
+                                    <h5
+                                        className="modal-title"
+                                        id="webcamModalLabel"
+                                    >
                                         Generating prediction!
                                     </h5>
-                                    <button type="button" className="close" aria-label="Close" onClick={this.closeWebcamModal}>
+                                    <button
+                                        type="button"
+                                        className="close"
+                                        aria-label="Close"
+                                        onClick={this.closeWebcamModal}
+                                    >
                                         <span aria-hidden="true">×</span>
                                     </button>
                                 </div>
                                 <div className="modal-body">
                                     <div className="text-center scoreboard">
-                                        <Webcam 
-                                            videoConstraints={videoConstraints} 
+                                        <Webcam
+                                            videoConstraints={videoConstraints}
                                             audio={false}
                                             mirrored={true}
-                                            style={{width: '100%'}}
+                                            style={{ width: '100%' }}
                                         />
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                }
-                <div className="modal-backdrop fade show" id="backdrop" style={{ display: 'none'}} ></div>
+                )}
+                <div
+                    className="modal-backdrop fade show"
+                    id="backdrop"
+                    style={{ display: 'none' }}
+                ></div>
             </div>
-        )
+        );
     }
 }
 

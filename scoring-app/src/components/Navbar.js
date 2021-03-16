@@ -7,11 +7,18 @@ class Navbar extends React.Component {
         return (
             <nav className="navbar navbar-custom">
                 <a className="navbar-brand navbar-text" href="/">
-                    <img id="logo" src={logo} width="50" height="30" className="d-inline-block align-top" alt="" />
+                    <img
+                        id="logo"
+                        src={logo}
+                        width="50"
+                        height="30"
+                        className="d-inline-block align-top"
+                        alt=""
+                    />
                     IntelliSquash
                 </a>
             </nav>
-        )
+        );
     }
 }
 
