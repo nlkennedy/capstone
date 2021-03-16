@@ -11,7 +11,6 @@ import requests
 #include <opencv2/core/cvstd.hpp>
 
 loaded_model = load_model(os.path.join(settings.BASE_DIR, 'scoring_app/model.h5'))
-print("Loaded model from disk")
 
 class VideoCamera(object):
     def __init__(self):
@@ -21,7 +20,6 @@ class VideoCamera(object):
         self.video.release()
 
     def get_frame(self, counter, check, bgModel):
-        print('starting get frame')
 
         prediction = ''
         prediction_actual = ''
@@ -56,7 +54,6 @@ class VideoCamera(object):
         cv2.putText(frame, f"Actual: {prediction}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)
         
         if not(check):
-            print('taking background image once?')
             bgModel = cv2.createBackgroundSubtractorMOG2(0, 50) 
             print(type(bgModel))
             check = True
@@ -65,11 +62,9 @@ class VideoCamera(object):
         isBgCaptured = 1
         
         if isBgCaptured == 1:
-            print("Background is captured")
             img = remove_background(frame)
             img = img[0:int(0.8 * frame.shape[0]),
                   int(0.5 * frame.shape[1]):frame.shape[1]]
-            print(img.shape)
             # do the processing after capturing the image
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             blur = cv2.GaussianBlur(gray, (41, 41), 0)
@@ -79,44 +74,36 @@ class VideoCamera(object):
 
             # generate prediction using trained model
             result = loaded_model.predict(image)
-            print(result)
 
             prediction = {}
             for idx, signal in signals.items():
                 prediction[signal] = result[0][idx]
                 if prediction[signal] >= 0.96:
-                    print(prediction[signal])
                     proper_prediction = True
 
             # Sorting based on top prediction
             prediction = sorted(prediction.items(), key = operator.itemgetter(1), reverse = True)
             if prediction[0][0] != 'none' and proper_prediction == True:
-                print('prediction not none.')
                 prediction = prediction[0][0]
                 counter[prediction] = counter[prediction] + 1
                 proper_prediction = True
             else:
                 proper_prediction = False
-            print(prediction)
 
             # We are using Motion JPEG, but OpenCV defaults to capture raw images,
             # so we must encode it into JPEG in order to correctly display the
             # video stream.
             if (proper_prediction == True):
-                print('Good result!')
                 cv2.putText(frame, f"Prediction: {signals_translated[prediction]}", (10, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1)    
                 cv2.putText(frame, f"Actual: {prediction}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 1) 
                 cv2.putText(frame, prediction[0][0], (30, 120), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1)
                 ret, jpeg = cv2.imencode('.jpg', frame)
-                print('COUNTER ')
-                print(counter)
                 for i in counter.values():
-                    if i >= 15:
+                    if i >= 5:
                         return -1, counter, check, bgModel
                 ret, jpeg = cv2.imencode('.jpg', frame)
                 return jpeg.tobytes(), counter, check, bgModel
             else:
-                print('Bad result!')
                 ret, jpeg = cv2.imencode('.jpg', frame)
                 return jpeg.tobytes(), counter, check, bgModel
                     
