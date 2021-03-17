@@ -64,7 +64,6 @@ def gen(camera):
             break
         yield (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-    return
 
 @csrf_exempt
 def video_feed(request): # pylint: disable=W0613 (unused-argument)
