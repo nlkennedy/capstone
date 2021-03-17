@@ -317,6 +317,15 @@ class GameScoring extends React.Component {
                     prediction.call +
                     '\n\nPlease select OK if the prediction looks correct. Otherwise, press cancel and input your prediction again.';
                 if (window.confirm(toDisplay)) {
+                    if (prediction.call === 'STROKE') {
+                        this.handleScorePlusOne(team + '_player_score', e);
+                    } else if (prediction.call === 'NO LET') {
+                        this.handleScorePlusOne(
+                            this.not(team) + '_player_score',
+                            e
+                        );
+                    }
+
                     this.updatePredictionState(game_id, prediction);
                     this.closeWebcamModal();
                 } else {
