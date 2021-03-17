@@ -8,7 +8,6 @@ from skimage.transform import resize
 #include <opencv2/core/cvstd.hpp>
 
 loaded_model = load_model(os.path.join(settings.BASE_DIR, 'scoring_app/model.h5'))
-print("Loaded model from disk")
 
 class VideoCamera():
     def __init__(self):
@@ -17,8 +16,8 @@ class VideoCamera():
     def __del__(self):
         self.video.release()
 
+
     def get_frame(self, counter, check, bg_model): # pylint: disable=R0914,R0915 (too-many-locals)(too-many-statements)
-        print('starting get frame')
         prediction = ''
 
         def remove_background(frame):
@@ -70,20 +69,16 @@ class VideoCamera():
         )
 
         if not check:
-            print('taking background image once?')
             bg_model = cv2.createBackgroundSubtractorMOG2(0, 50)
-            print(type(bg_model))
             check = True
 
         proper_prediction = False
         is_bg_captured = 1
 
         if is_bg_captured == 1:
-            print("Background is captured")
             img = remove_background(frame)
             img = img[0:int(0.8 * frame.shape[0]),
                   int(0.5 * frame.shape[1]):frame.shape[1]]
-            print(img.shape)
             # do the processing after capturing the image
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             blur = cv2.GaussianBlur(gray, (41, 41), 0)
@@ -93,31 +88,27 @@ class VideoCamera():
 
             # generate prediction using trained model
             result = loaded_model.predict(image)
-            print(result)
 
             prediction = {}
             for idx, signal in signals.items():
                 prediction[signal] = result[0][idx]
                 if prediction[signal] >= 0.96:
-                    print(prediction[signal])
                     proper_prediction = True
 
             # Sorting based on top prediction
             prediction = sorted(prediction.items(), key = operator.itemgetter(1), reverse = True)
+
             if prediction[0][0] != 'none' and proper_prediction is True:
-                print('prediction not none.')
                 prediction = prediction[0][0]
                 counter[prediction] = counter[prediction] + 1
                 proper_prediction = True
             else:
                 proper_prediction = False
-            print(prediction)
 
             # We are using Motion JPEG, but OpenCV defaults to capture raw images,
             # so we must encode it into JPEG in order to correctly display the
             # video stream.
             if proper_prediction is True:
-                print('Good result!')
                 cv2.putText(
                     frame,
                     f"Prediction: {signals_translated[prediction]}",
@@ -146,14 +137,11 @@ class VideoCamera():
                     1
                 )
                 _, jpeg = cv2.imencode('.jpg', frame)
-                print('COUNTER ')
-                print(counter)
                 for i in counter.values():
-                    if i >= 15:
+                    if i >= 5:
                         return -1, counter, check, bg_model
                 _, jpeg = cv2.imencode('.jpg', frame)
                 return jpeg.tobytes(), counter, check, bg_model
 
-            print('Bad result!')
             _, jpeg = cv2.imencode('.jpg', frame)
             return jpeg.tobytes(), counter, check, bg_model

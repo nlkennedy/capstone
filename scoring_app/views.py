@@ -56,19 +56,15 @@ def gen(camera):
     bg_model = cv2.createBackgroundSubtractorMOG2(0, 50)
 
     while True:
-        print('calling get frame')
         frame, counter, check, bg_model = camera.get_frame(counter, check, bg_model)
         if frame == -1:
             counter = dict(sorted(counter.items(), key=lambda item: item[1]))
-            print('sorted ', counter)
             answer = shortened[list(counter)[3]]
-            print('Final answer ', answer)
             yield answer
             break
         yield (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-    print('done with gen')
-    return 'Hi!!'
+    return
 
 @csrf_exempt
 def video_feed(request): # pylint: disable=W0613 (unused-argument)
