@@ -21,8 +21,12 @@ class TeamMatches(models.Model):
 class Matches(models.Model):
     match_id = models.AutoField(primary_key=True)
     team_match_id = models.ForeignKey(TeamMatches, on_delete=models.CASCADE)
-    home_player_id = models.ForeignKey(Players, on_delete=models.CASCADE, related_name='home_player')
-    away_player_id = models.ForeignKey(Players, on_delete=models.CASCADE, related_name='away_player')
+    home_player_id = (
+        models.ForeignKey(Players, on_delete=models.CASCADE, related_name='home_player')
+    )
+    away_player_id = (
+        models.ForeignKey(Players, on_delete=models.CASCADE, related_name='away_player')
+    )
     home_player_score = models.IntegerField(default=0)
     away_player_score = models.IntegerField(default=0)
     match_rank = models.IntegerField()

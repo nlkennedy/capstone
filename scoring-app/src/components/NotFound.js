@@ -5,9 +5,11 @@ class NotFound extends React.Component {
         return (
             <div style={{ marginTop: '10%' }}>
                 <h1>404 Not Found</h1>
-                <a className="nav-link" href="/">Back to Home</a>
+                <a className="nav-link" href="/">
+                    Back to Home
+                </a>
             </div>
-        )
+        );
     }
 }
 

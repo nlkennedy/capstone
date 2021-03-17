@@ -1,22 +1,23 @@
-from django.shortcuts import render
-from django.http.response import StreamingHttpResponse
-from scoring_app.camera import VideoCamera
-from .models import Teams, Players, TeamMatches, Matches, Games
-from django.core import serializers
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+# pylint: disable=W0702 (bare-except)
 import json
-import re 
-import numpy as np
-import cv2
-from django.views import View
+import re
 import os
 from functools import reduce
+import cv2
+from django.shortcuts import render
+from django.http.response import StreamingHttpResponse
+from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, HttpResponseNotFound
+from django.views import View
+from scoring_app.camera import VideoCamera
+from .models import Teams, Players, TeamMatches, Matches, Games
 
-specialChars = re.compile('[@_!#$%^&*()<>?/\|}{~:=]')
+specialChars = re.compile(r'[@_!#$%^&*()<>?/\|}{~:=]')
+DONE = False
 
 class Assets(View):
-    def get(self, _request, filename):
+    def get(self, _request, filename): # pylint: disable=R0201 (no-self-use)
         path = os.path.join(os.path.dirname(__file__), 'static', filename)
 
         if os.path.isfile(path):
@@ -25,11 +26,9 @@ class Assets(View):
         else:
             return HttpResponseNotFound()
 
-specialChars = re.compile('[@_!#$%^&*()<>?/\|}{~:=]')
-done = False 
-def representsInt(s):
-    try: 
-        int(s)
+def represents_int(string):
+    try:
+        int(string)
         return True
     except ValueError:
         return False
@@ -38,7 +37,7 @@ def index(request):
     return render(request, 'scoring_app/home.html')
 
 def predict_page(request):
-    return render(request, 'scoring_app/predict.html') 
+    return render(request, 'scoring_app/predict.html')
 
 def gen(camera):
     # keeping track of number of times each prediction is made
@@ -46,30 +45,29 @@ def gen(camera):
         'let' : 0,
         'nolet' : 0,
         'none' : 0,
-        'stroke' : 0  
+        'stroke' : 0
     }
     shortened = {
         'let' : 'let',
         'nolet' : 'nlt',
-        'stroke' : 'str'  
+        'stroke' : 'str'
     }
     check = False
-    bgModel = cv2.createBackgroundSubtractorMOG2(0, 50) 
+    bg_model = cv2.createBackgroundSubtractorMOG2(0, 50)
 
     while True:
-        frame, counter, check, bgModel = camera.get_frame(counter, check, bgModel)
+        frame, counter, check, bg_model = camera.get_frame(counter, check, bg_model)
         if frame == -1:
             counter = dict(sorted(counter.items(), key=lambda item: item[1]))
             answer = shortened[list(counter)[3]]
-            yield (answer)
+            yield answer
             break
-        else: 
-            yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        yield (b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
     return
 
 @csrf_exempt
-def video_feed(request):
+def video_feed(request): # pylint: disable=W0613 (unused-argument)
     result = StreamingHttpResponse(gen(VideoCamera()),
                 content_type='multipart/x-mixed-replace; boundary=frame')
     return result
@@ -80,41 +78,44 @@ def teams(request):
         queryset = Teams.objects.all()
         data = serializers.serialize('json', queryset)
         return HttpResponse(data, content_type='application/json')
-    elif request.method == 'POST':
+
+    if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
             json_body = json.loads(body)
-            #Verify Name
-            if (specialChars.search(json_body['team_name']) != None):
+            # verify name
+            if specialChars.search(json_body['team_name']) is not None:
                 return HttpResponse(status=400)
 
             Teams.objects.create(team_name=json_body['team_name'])
         except:
             return HttpResponse(status=500)
-        return HttpResponse(status=201)
+
+    return HttpResponse(status=201)
 
 @csrf_exempt
 def players(request):
     if request.method == 'GET':
         body = request.body.decode('utf-8')
         json_body = json.loads(body)
-        #Verify Id
-        if not representsInt(json_body['team_id']):
+        # verify id
+        if not represents_int(json_body['team_id']):
             return HttpResponse(status=400)
 
         queryset = Players.objects.all().filter(team_id=json_body['team_id'])
         data = serializers.serialize('json', queryset)
         return HttpResponse(data, content_type='application/json')
-    elif request.method == 'POST':
+
+    if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
             json_body = json.loads(body)
 
-            #Verify Data
-            if not representsInt(json_body['team_id']):
+            # verify data
+            if not represents_int(json_body['team_id']):
                 return HttpResponse(status=400)
 
-            if (specialChars.search(json_body['name']) != None):
+            if specialChars.search(json_body['name']) is not None:
                 return HttpResponse(status=400)
 
             Players.objects.create(
@@ -123,7 +124,8 @@ def players(request):
             )
         except:
             return HttpResponse(status=500)
-        return HttpResponse(status=201)
+
+    return HttpResponse(status=201)
 
 @csrf_exempt
 def teammatches(request):
@@ -131,13 +133,17 @@ def teammatches(request):
         queryset = TeamMatches.objects.all()
         data = serializers.serialize('json', queryset)
         return HttpResponse(data, content_type='application/json')
-    elif request.method == 'POST':
+
+    if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
             json_body = json.loads(body)
 
-            #Verify ids
-            if (not representsInt(json_body['home_team_id'])) or (not representsInt(json_body['away_team_id'])):
+            # verify ids
+            if (
+                (not represents_int(json_body['home_team_id'])) or
+                (not represents_int(json_body['away_team_id']))
+            ):
                 return HttpResponse(status=400)
 
             TeamMatches.objects.create(
@@ -146,7 +152,8 @@ def teammatches(request):
             )
         except:
             return HttpResponse(status=500)
-        return HttpResponse(status=201)
+
+    return HttpResponse(status=201)
 
 @csrf_exempt
 def teammatches_all(request):
@@ -155,11 +162,13 @@ def teammatches_all(request):
             body = request.body.decode('utf-8')
             data = json.loads(body)
 
-            #Make sure there are no special characters in data passed from user
-            if specialChars.search(data['home_team_name']) != None:
+            # make sure there are no special characters in data passed from user
+            if (
+                (specialChars.search(data['home_team_name']) is not None) or
+                (specialChars.search(data['away_team_name']) is not None)
+            ):
                 return HttpResponse(status=400)
-            if specialChars.search(data['away_team_name']) != None:
-                return HttpResponse(status=400)
+
             # create teams
             home_team = Teams.objects.create(team_name=data['home_team_name'])
             away_team = Teams.objects.create(team_name=data['away_team_name'])
@@ -170,17 +179,15 @@ def teammatches_all(request):
                 away_team_id=away_team,
             )
 
-            for match in data['matches']: 
-                # Verify no special characters
-                if (specialChars.search(match['home_player']) != None):
+            for match in data['matches']:
+                # verify no special characters and data
+                if (
+                    (specialChars.search(match['home_player']) is not None) or
+                    (specialChars.search(match['away_player']) is not None) or
+                    (not represents_int(match['match_rank'])) or
+                    (not represents_int(match['court_number']))
+                ):
                     return HttpResponse(status=400)
-                if (specialChars.search(match['away_player']) != None):
-                    return HttpResponse(status=400)
-                #Verify data
-                if (not representsInt(match['match_rank'])):
-                    return HttpResponse(status=400)
-                if (not representsInt(match['court_number'])):
-                    return HttpResponse(status=400)   
 
                 # create players
                 home_player = Players.objects.create(team_id=home_team, name=match['home_player'])
@@ -199,15 +206,16 @@ def teammatches_all(request):
             return HttpResponse(data, content_type='application/json')
         except:
             return HttpResponse(status=500)
+
     return HttpResponse(status=201)
 
 @csrf_exempt
 def teammatches_summary(request):
     if request.method == 'GET':
         try:
-            teammatches = TeamMatches.objects.all()
+            teammatches_objects = TeamMatches.objects.all()
             summary = []
-            for teammatch in teammatches:             
+            for teammatch in teammatches_objects:
                 entry = {
                     "pk": teammatch.pk,
                     "home_team_name": teammatch.home_team_id.team_name,
@@ -222,34 +230,35 @@ def teammatches_summary(request):
         except:
             return HttpResponse(status=500)
 
+    return HttpResponse(status=200)
+
 @csrf_exempt
-def matches(request):
+def matches(request): # pylint: disable=R0911 (too-many-return-statements)
     if request.method == 'GET':
         team_match_id = request.GET['team_match_id']
 
-        #Verify ID  
-        if not representsInt(team_match_id):
+        # verify id
+        if not represents_int(team_match_id):
             return HttpResponse(status=400)
 
         queryset = Matches.objects.all().filter(team_match_id=team_match_id)
         data = serializers.serialize('json', queryset)
         return HttpResponse(data, content_type='application/json')
-    elif request.method == 'POST':
+
+    if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
             json_body = json.loads(body)
-            #Verify Ids 
-            if (not representsInt(json_body['team_match_id'])):
+
+            # verify ids & data
+            if (
+                (not represents_int(json_body['team_match_id'])) or
+                (not represents_int(json_body['home_player_id'])) or
+                (not represents_int(json_body['away_player_id'])) or
+                (not represents_int(json_body['match_rank'])) or
+                (not represents_int(json_body['court_number']))
+            ):
                 return HttpResponse(status=400)
-            if (not representsInt(json_body['home_player_id'])):
-                return HttpResponse(status=400)
-            if (not representsInt(json_body['away_player_id'])):
-                return HttpResponse(status=400)
-            #Verify data
-            if (not representsInt(json_body['match_rank'])):
-                return HttpResponse(status=400)
-            if (not representsInt(json_body['court_number'])):
-                return HttpResponse(status=400)   
 
             Matches.objects.create(
                 team_match_id=TeamMatches.objects.get(pk=json_body['team_match_id']),
@@ -258,15 +267,16 @@ def matches(request):
                 match_rank=json_body['match_rank'],
                 court_number=json_body['court_number']
             )
+            return HttpResponse(status=201)
         except:
             return HttpResponse(status=500)
-        return HttpResponse(status=201)
-    elif request.method == 'PATCH':
+
+    if request.method == 'PATCH':
         try:
             body = request.body.decode('utf-8')
             data = json.loads(body)
 
-            if (not isinstance(data['match_id'], int)):
+            if not isinstance(data['match_id'], int):
                 return HttpResponse(status=400)
 
             match = Matches.objects.get(pk=data['match_id'])
@@ -276,7 +286,7 @@ def matches(request):
             match.done = data['done']
             match.save()
 
-            # check if teammatch is done and update as necesary 
+            # check if teammatch is done and update as necesary
             all_matches = Matches.objects.filter(team_match_id=match.team_match_id.pk)
             team_match_done = reduce(lambda a, b : a & b.done, all_matches, True)
             if team_match_done:
@@ -286,10 +296,10 @@ def matches(request):
 
             response_data = json.dumps({'match_id': match.pk})
             return HttpResponse(response_data, content_type='application/json')
-        except: 
+        except:
             return HttpResponse(status=500)
-    return HttpResponse(status=201)
 
+    return HttpResponse(status=201)
 
 @csrf_exempt
 def matches_summary(request):
@@ -297,15 +307,15 @@ def matches_summary(request):
         try:
             team_match_id = request.GET['team_match_id']
 
-            #Verify ID
-            if not representsInt(team_match_id):
+            # verify id
+            if not represents_int(team_match_id):
                 return HttpResponse(status=400)
 
             teammatch = TeamMatches.objects.get(pk=team_match_id)
-            matches = Matches.objects.all().filter(team_match_id=team_match_id)
+            matches_object = Matches.objects.all().filter(team_match_id=team_match_id)
             match_summary = []
 
-            for match in matches: 
+            for match in matches_object:
                 entry = {
                     "pk": match.pk,
                     "home_player_name": match.home_player_id.name,
@@ -329,13 +339,15 @@ def matches_summary(request):
         except:
             return HttpResponse(status=500)
 
+    return HttpResponse(status=200)
+
 @csrf_exempt
-def games(request):
+def games(request): # pylint: disable=R0911 (too-many-return-statements)
     if request.method == 'GET':
         game_id = request.GET['game_id']
-        
-        #Verify ID
-        if not representsInt(game_id):
+
+        # verify id
+        if not represents_int(game_id):
             return HttpResponse(status=400)
 
         game = Games.objects.get(pk=game_id)
@@ -367,13 +379,14 @@ def games(request):
 
         response_data = json.dumps(data)
         return HttpResponse(response_data, content_type='application/json')
-    elif request.method == 'POST':
+
+    if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
             data = json.loads(body)
 
-            #Verify Id
-            if not representsInt(data['match_id']):
+            # verify id
+            if not represents_int(data['match_id']):
                 return HttpResponse(status=400)
 
             game = Games.objects.create(
@@ -385,15 +398,16 @@ def games(request):
             return HttpResponse(response_data, content_type='application/json')
         except:
             return HttpResponse(status=500)
-    elif request.method == 'PATCH':
+
+    if request.method == 'PATCH':
         try:
             body = request.body.decode('utf-8')
             data = json.loads(body)
 
-            #Verify Id
-            if not representsInt(data['game_id']):
+            # verify id
+            if not represents_int(data['game_id']):
                 return HttpResponse(status=400)
-                
+
             game = Games.objects.get(pk=data['game_id'])
 
             game.home_player_score = data['home_player_score']
@@ -405,6 +419,7 @@ def games(request):
             return HttpResponse(response_data, content_type='application/json')
         except:
             return HttpResponse(status=500)
+
     return HttpResponse(status=201)
 
 @csrf_exempt
@@ -412,14 +427,14 @@ def games_summary(request):
     if request.method == 'GET':
         match_id = request.GET['match_id']
 
-        #Verify Id
-        if not representsInt(match_id):
+        # verify id
+        if not represents_int(match_id):
             return HttpResponse(status=400)
-                
-        games = Games.objects.all().filter(match_id=match_id)
-        games_summary = []
 
-        for game in games: 
+        games_objects = Games.objects.all().filter(match_id=match_id)
+        games_summary_object = []
+
+        for game in games_objects:
             entry = {
                 "pk": game.pk,
                 "home_player_score": game.home_player_score,
@@ -427,25 +442,9 @@ def games_summary(request):
                 "game_number": game.game_number,
                 "done": game.done
             }
-            games_summary.append(entry)
+            games_summary_object.append(entry)
 
-        data = json.dumps(games_summary)
+        data = json.dumps(games_summary_object)
         return HttpResponse(data, content_type='application/json')
 
-
-
-
-
-'''
-
-
-
-def post_new_game(request):
-
-def update_game(request):
-
-def get_games(request):
-
-def get_summary(request):
-
-'''
+    return HttpResponse(status=200)

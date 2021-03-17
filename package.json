@@ -20,12 +20,26 @@
     "start": "cd scoring-app && react-scripts start",
     "build": "cd scoring-app && react-scripts build",
     "test": "cd scoring-app && react-scripts test",
-    "eject": "cd scoring-app && react-scripts eject"
+    "eject": "cd scoring-app && react-scripts eject",
+    "eslint": "eslint scoring-app/",
+    "eslintfix": "eslint scoring-app/ --fix",
+    "stylelint": "npx stylelint scoring-app/**/*.css"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:prettier/recommended"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 4
+  },
+  "stylelint": {
+    "extends": [
+      "stylelint-config-standard",
+      "stylelint-prettier/recommended"
     ]
   },
   "browserslist": {
@@ -39,5 +53,16 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^7.22.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.22.0",
+    "prettier": "^2.2.1",
+    "stylelint": "^13.12.0",
+    "stylelint-config-prettier": "^8.0.2",
+    "stylelint-config-standard": "^21.0.0",
+    "stylelint-prettier": "^1.2.0"
   }
 }

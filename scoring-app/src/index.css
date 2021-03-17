@@ -1,125 +1,126 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+        'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+        'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
 }
 
 /* Navbar */
 #logo {
-  /* change color to white */
-  filter: invert(100%) sepia(0%) saturate(924%) hue-rotate(282deg) brightness(118%) contrast(100%);
+    /* change color to white */
+    filter: invert(100%) sepia(0%) saturate(924%) hue-rotate(282deg)
+        brightness(118%) contrast(100%);
 }
 
-.navbar-custom { 
-  background-color: #474d65; 
-} 
+.navbar-custom {
+    background-color: #474d65;
+}
 
-.navbar-custom .navbar-text { 
-  color: #ffffff; 
-} 
+.navbar-custom .navbar-text {
+    color: #fff;
+}
 
 /* Home / About Page */
 .btn-custom {
-  margin: 1%;
+    margin: 1%;
 }
 
 #main {
-  overflow: auto;
-  padding-bottom: 60px; /* this needs to be bigger than footer height*/
+    overflow: auto;
+    padding-bottom: 60px; /* this needs to be bigger than footer height */
 }
 
 #wrap {
-  min-height: 100%;
+    min-height: 100%;
 }
 
 .hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .footer {
-  position: relative;
-  margin-top: -60px; /* negative value of footer height */
-  height: 60px;
-  clear: both;
-  padding-top:20px;
-} 
+    position: relative;
+    margin-top: -60px; /* negative value of footer height */
+    height: 60px;
+    clear: both;
+    padding-top: 20px;
+}
 
 /* Create Matchup */
 
 .form-box {
-  border: 1px solid #6c757d;
-  padding: 2%;
+    border: 1px solid #6c757d;
+    padding: 2%;
 }
 
 .matchup-row {
-  margin-bottom: 2%;
-  border-bottom: 1px solid #6c757d;
+    margin-bottom: 2%;
+    border-bottom: 1px solid #6c757d;
 }
 
 /* Matchup */
 .table-game-sum {
-  margin-bottom: 0rem !important;
+    margin-bottom: 0 !important;
 }
 
 .team1-winner {
-  background-color: rgba(71,77,101,0.7);
+    background-color: rgba(71, 77, 101, 0.7);
 }
 
 .team2-winner {
-  background-color: rgba(168,103,96,0.7);
+    background-color: rgba(168, 103, 96, 0.7);
 }
 
 .table > tbody > tr > td {
-  vertical-align: middle;
+    vertical-align: middle;
 }
 
 .table > tbody > tr > th {
-  vertical-align: middle;
+    vertical-align: middle;
 }
 
 .matchup-header {
-  background-color: #e9ecef;
+    background-color: #e9ecef;
 }
 
 /* Game Scoring */
 .shaded-gray {
-  background-color: #e9ecef;
-  padding: 5%;
-  margin-bottom: 5%;
+    background-color: #e9ecef;
+    padding: 5%;
+    margin-bottom: 5%;
 }
 
 .shaded-red {
-  background-color: #a86760;
-  padding: 2.5% 0%;
+    background-color: #a86760;
+    padding: 2.5% 0%;
 }
 
 .shaded-red-disabled {
-  background-color: #d2b0ad;
-  padding: 2.5% 0%;
+    background-color: #d2b0ad;
+    padding: 2.5% 0%;
 }
 
 .shaded-blue {
-  background-color: #474d65;
-  padding: 5%;
+    background-color: #474d65;
+    padding: 5%;
 }
 
 .shaded-orange {
-  background-color: #cdb58c;
-  border: 1px solid #6c757d;
-  padding: 5%;
+    background-color: #cdb58c;
+    border: 1px solid #6c757d;
+    padding: 5%;
 }
 
 .game-button {
-  border: 1px solid #6c757d;
-  padding: 5%;
+    border: 1px solid #6c757d;
+    padding: 5%;
 }
 
 .scrollable {
@@ -131,16 +132,15 @@ code {
 
 /* Game Scoreboard */
 .scoreboard {
-  font-size: 7rem;
-  margin-bottom: .5rem;
-  font-weight: 500;
-  line-height: 1.2;
+    font-size: 7rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    line-height: 1.2;
 }
 
 .shaded-dark-gray {
-  background-color: #6c757d;
+    background-color: #6c757d;
 }
-
 
 /* 
 COLORS

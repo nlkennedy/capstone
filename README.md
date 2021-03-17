@@ -37,3 +37,9 @@ This must be done before every deploy and `heroku local web` run to see the new 
 4. Move the `scoring-app/build` folder to root. 
 5. Run `python3 manage.py collectstatic`. 
 6. Run `heroku local web` to restart the app. 
+
+### Linting
+* Run pylint: pylint scoring_app
+* Run eslint: yarn eslint
+* Run eslint with fix: yarn eslintfix
+* Run stylelint: yarn stylelint

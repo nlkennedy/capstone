@@ -7,4 +7,3 @@ admin.site.register(Players)
 admin.site.register(TeamMatches)
 admin.site.register(Matches)
 admin.site.register(Games)
-
