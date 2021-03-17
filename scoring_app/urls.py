@@ -1,6 +1,5 @@
-from django.urls import path, include
+from django.urls import path
 from scoring_app import views
-from django.contrib import admin
 
 urlpatterns = [
     path('home.html', views.index, name='index'),
