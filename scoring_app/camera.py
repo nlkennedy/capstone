@@ -140,6 +140,8 @@ class VideoCamera():
                 for i in counter.values():
                     if i >= 5:
                         return -1, counter, check, bg_model
+                _, jpeg = cv2.imencode('.jpg', frame)
+                return jpeg.tobytes(), counter, check, bg_model
 
             _, jpeg = cv2.imencode('.jpg', frame)
             return jpeg.tobytes(), counter, check, bg_model
