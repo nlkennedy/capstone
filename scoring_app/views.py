@@ -3,16 +3,22 @@ import json
 import re
 import os
 from functools import reduce
+import io
+import base64
+import operator
 import cv2
-from django.shortcuts import render
-from django.http.response import StreamingHttpResponse
+import numpy as np
+from keras.models import load_model
+from skimage.transform import resize
+from imageio import imread
+from django.conf import settings
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseNotFound
 from django.views import View
-from scoring_app.camera import VideoCamera
 from .models import Teams, Players, TeamMatches, Matches, Games
 
+loaded_model = load_model(os.path.join(settings.BASE_DIR, 'scoring_app/model.h5'))
 specialChars = re.compile(r'[@_!#$%^&*()<>?/\|}{~:=]')
 DONE = False
 
@@ -33,43 +39,105 @@ def represents_int(string):
     except ValueError:
         return False
 
-def index(request):
-    return render(request, 'scoring_app/home.html')
+def get_prediction(check, bg_model, frame): # pylint: disable=R0914 (too-many-locals)
+    prediction = ''
 
-def predict_page(request):
-    return render(request, 'scoring_app/predict.html')
+    def remove_background(frame):
+        fgmask = bg_model.apply(frame, learningRate = 0)
+        kernel = np.ones((3, 3), np.uint8)
+        fgmask = cv2.erode(fgmask, kernel, iterations = 1)
+        res = cv2.bitwise_and(frame, frame, mask = fgmask)
+        return res
 
-def gen(camera):
-    # keeping track of number of times each prediction is made
-    counter = {
-        'let' : 0,
-        'nolet' : 0,
-        'none' : 0,
-        'stroke' : 0
-    }
-    shortened = {
-        'let' : 'let',
-        'nolet' : 'nlt',
-        'stroke' : 'str'
-    }
-    check = False
-    bg_model = cv2.createBackgroundSubtractorMOG2(0, 50)
+    signals = {0: 'let', 1: 'nolet', 2: 'none', 3: 'stroke'}
 
-    while True:
-        frame, counter, check, bg_model = camera.get_frame(counter, check, bg_model)
-        if frame == -1:
-            counter = dict(sorted(counter.items(), key=lambda item: item[1]))
-            answer = shortened[list(counter)[3]]
-            yield answer
-            break
-        yield (b'--frame\r\n'
-            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+    # smoothing filter
+    frame = cv2.bilateralFilter(frame, 5, 50, 100)
+
+    if not check:
+        bg_model = cv2.createBackgroundSubtractorMOG2(0, 50)
+        check = True
+
+    proper_prediction = False
+
+    img = remove_background(frame)
+    img = img[0:int(0.8 * frame.shape[0]),
+            int(0.5 * frame.shape[1]):frame.shape[1]]
+    # do the processing after capturing the image
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (41, 41), 0)
+    _, thresh = cv2.threshold(blur,60,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    image = resize(thresh, (64, 64))
+    image = image.reshape(1, 64, 64, 1)
+
+    # generate prediction using trained model
+    result = loaded_model.predict(image)
+
+    prediction = {}
+    for idx, signal in signals.items():
+        prediction[signal] = result[0][idx]
+        if prediction[signal] >= 0.96:
+            proper_prediction = True
+
+    # Sorting based on top prediction
+    prediction = sorted(prediction.items(), key = operator.itemgetter(1), reverse = True)
+
+    if proper_prediction is True:
+        prediction = prediction[0][0]
+        proper_prediction = True
+        return prediction, check, bg_model
+
+    return 'inconclusive', check, bg_model
 
 @csrf_exempt
-def video_feed(request): # pylint: disable=W0613 (unused-argument)
-    result = StreamingHttpResponse(gen(VideoCamera()),
-                content_type='multipart/x-mixed-replace; boundary=frame')
-    return result
+def predict_ref_signal(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        images = json.loads(body)
+
+        counter = {
+            'let' : 0,
+            'nolet' : 0,
+            'none' : 0,
+            'stroke' : 0,
+            'inconclusive': 0,
+            'nodata': 0
+        }
+
+        signals_translated = {
+            'let': 'LET',
+            'nolet': 'NO LET',
+            'none': 'NONE',
+            'stroke': 'STROKE',
+        }
+
+        check = False
+        bg_model = cv2.createBackgroundSubtractorMOG2(0, 50)
+
+        for image in images['images']:
+            if not image:
+                counter['nodata'] += 1
+                continue
+
+            frame = imread(io.BytesIO(base64.b64decode(image.split(',')[1])))
+            prediction, check, bg_model = get_prediction(check, bg_model, frame)
+            counter[prediction] += 1
+
+        counter.pop('none')
+        counter.pop('nodata')
+        counter.pop('inconclusive')
+
+        if all(value == 0 for value in counter.values()):
+            final_prediction = 'inconclusive'
+        else:
+            final_prediction = (
+                signals_translated[max(counter.items(), key=operator.itemgetter(1))[0]]
+            )
+
+        response_data = json.dumps({'prediction': final_prediction})
+        return HttpResponse(response_data, content_type='application/json')
+
+    return HttpResponse(status=201)
 
 @csrf_exempt
 def teams(request):

@@ -2,9 +2,7 @@ from django.urls import path
 from scoring_app import views
 
 urlpatterns = [
-    path('home.html', views.index, name='index'),
-    path('predict.html', views.predict_page, name='predict_page'),
-    path('video_feed', views.video_feed, name='video_feed'),
+    path('api/predict_ref_signal', views.predict_ref_signal, name='predict_ref_signal'),
     path('api/teammatches', views.teammatches),
     path('api/teammatches-summary', views.teammatches_summary),
     path('api/teammatches-all', views.teammatches_all),
