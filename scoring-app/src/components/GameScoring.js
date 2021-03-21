@@ -19,7 +19,7 @@ class GameScoring extends React.Component {
             webcamEnabled: false,
             images: [],
             interval: null,
-            ref_call: '',   // 'home' or 'away', team that asks for a ref call
+            ref_call: '', // 'home' or 'away', team that asks for a ref call
         };
 
         this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
@@ -297,12 +297,12 @@ class GameScoring extends React.Component {
 
     setRef = (webcam) => {
         this.webcam = webcam;
-    }
+    };
 
     capture() {
         const imageSrc = this.webcam.getScreenshot();
         return imageSrc;
-    };
+    }
 
     takeImage() {
         if (this.state.images.length > 50) {
@@ -312,14 +312,14 @@ class GameScoring extends React.Component {
         } else {
             var images = this.state.images;
             images.push(this.capture());
-            this.setState({ images: images })
+            this.setState({ images: images });
         }
     }
 
     handlePrediction() {
         var data = {
             images: this.state.images,
-        }
+        };
 
         axiosInstance.post(`api/predict_ref_signal`, data).then(
             (res) => {
@@ -329,27 +329,32 @@ class GameScoring extends React.Component {
                     call: res.data.prediction,
                     team: this.state.match[team + '_team_name'],
                 };
-
+                var toDisplay;
                 document.getElementById('processing').style.display = 'none';
-                if (prediction.call == 'inconclusive') {
-                    var toDisplay = "Your prediction was inconclusive. Please select OK to try again."
+                if (prediction.call === 'inconclusive') {
+                    toDisplay =
+                        'Your prediction was inconclusive. Please select OK to try again.';
                     if (window.confirm(toDisplay)) {
                         this.handleRefereeCall(team);
                     } else {
                         this.closeWebcamModal(true);
                     }
                 } else {
-                    var toDisplay =
+                    toDisplay =
                         'Here is your prediction: ' +
                         prediction.call +
                         '\n\nPlease select OK if the prediction looks correct. Otherwise, press cancel and input your prediction again.';
 
                     if (window.confirm(toDisplay)) {
                         if (prediction.call === 'STROKE') {
-                            this.handleScorePlusOne(team + '_player_score', null);
+                            this.handleScorePlusOne(
+                                team + '_player_score',
+                                null
+                            );
                         } else if (prediction.call === 'NO LET') {
                             this.handleScorePlusOne(
-                                this.not(team) + '_player_score', null
+                                this.not(team) + '_player_score',
+                                null
                             );
                         }
 
@@ -367,27 +372,27 @@ class GameScoring extends React.Component {
     }
 
     handleRefereeCall(team) {
-        this.setState({ ref_call: team })
-        this.setState(
-            { images: [] },
-            () => {
-                var interval = setInterval(this.takeImage.bind(this), 50)
-                this.setState({ interval: interval });
-            }
-        )
+        this.setState({ ref_call: team });
+        this.setState({ images: [] }, () => {
+            var interval = setInterval(this.takeImage.bind(this), 50);
+            this.setState({ interval: interval });
+        });
     }
 
     // don't know how to make this wait without setting standard timeout
     openWebcamModal(e, _callback) {
         this.setState({ webcamEnabled: true }, () => {
-            const team = arguments[2]
+            const team = arguments[2];
             document.getElementById('backdrop').style.display = 'block';
             document.getElementById('webcamModal').style.display = 'block';
             document.getElementById('webcamModal').className += 'show';
 
-            setTimeout(function() {
-                _callback(team);
-            }.bind(_callback, team), 100);
+            setTimeout(
+                function () {
+                    _callback(team);
+                }.bind(_callback, team),
+                100
+            );
         });
     }
 
@@ -588,7 +593,11 @@ class GameScoring extends React.Component {
                                         className="shaded-orange"
                                         type="button"
                                         onClick={(e) =>
-                                            this.openWebcamModal(e, this.handleRefereeCall, 'home')
+                                            this.openWebcamModal(
+                                                e,
+                                                this.handleRefereeCall,
+                                                'home'
+                                            )
                                         }
                                     >
                                         Referee Call
@@ -617,7 +626,11 @@ class GameScoring extends React.Component {
                                         className="shaded-orange"
                                         type="button"
                                         onClick={(e) =>
-                                            this.openWebcamModal(e, this.handleRefereeCall, 'away')
+                                            this.openWebcamModal(
+                                                e,
+                                                this.handleRefereeCall,
+                                                'away'
+                                            )
                                         }
                                     >
                                         Referee Call
@@ -692,7 +705,9 @@ class GameScoring extends React.Component {
                                         type="button"
                                         className="close"
                                         aria-label="Close"
-                                        onClick={(e) => this.closeWebcamModal(true)}
+                                        onClick={(e) =>
+                                            this.closeWebcamModal(true)
+                                        }
                                     >
                                         <span aria-hidden="true">×</span>
                                     </button>
@@ -708,7 +723,12 @@ class GameScoring extends React.Component {
                                             style={{ width: '100%' }}
                                         />
                                     </div>
-                                    <div id="processing" style={{ display: 'none' }}>Processing...</div>
+                                    <div
+                                        id="processing"
+                                        style={{ display: 'none' }}
+                                    >
+                                        Processing...
+                                    </div>
                                 </div>
                             </div>
                         </div>
