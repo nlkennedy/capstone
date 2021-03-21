@@ -17,6 +17,9 @@ class GameScoring extends React.Component {
             },
             prev_point: '',
             webcamEnabled: false,
+            images: [],
+            interval: null,
+            ref_call: '',   // 'home' or 'away', team that asks for a ref call
         };
 
         this.handleScorePlusOne = this.handleScorePlusOne.bind(this);
@@ -37,6 +40,8 @@ class GameScoring extends React.Component {
         this.openWebcamModal = this.openWebcamModal.bind(this);
         this.closeWebcamModal = this.closeWebcamModal.bind(this);
         this.handleUndo = this.handleUndo.bind(this);
+        this.takeImage = this.takeImage.bind(this);
+        this.handlePrediction = this.handlePrediction.bind(this);
     }
 
     componentDidMount() {
@@ -166,7 +171,9 @@ class GameScoring extends React.Component {
     }
 
     handleScorePlusOne(team_score, e) {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
 
         // update state
         var game = this.state.game;
@@ -288,48 +295,69 @@ class GameScoring extends React.Component {
         this.updateServeButtons(e.target.id);
     }
 
-    handleRefereeCall(team, e) {
-        console.log('The ' + team + ' team requests a referee call');
-        const game_id = this.state.game.game_id;
-        this.openWebcamModal();
+    setRef = (webcam) => {
+        this.webcam = webcam;
+    }
 
-        var keys = {
-            let: 'LET',
-            nlt: 'NO LET',
-            str: 'STROKE',
-        };
+    capture() {
+        const imageSrc = this.webcam.getScreenshot();
+        return imageSrc;
+    };
 
-        axiosInstance.get(`video_feed`).then(
+    takeImage() {
+        if (this.state.images.length > 50) {
+            clearInterval(this.state.interval);
+            document.getElementById('processing').style.display = 'block';
+            this.handlePrediction();
+        } else {
+            var images = this.state.images;
+            images.push(this.capture());
+            this.setState({ images: images })
+        }
+    }
+
+    handlePrediction() {
+        var data = {
+            images: this.state.images,
+        }
+
+        axiosInstance.post(`api/predict_ref_signal`, data).then(
             (res) => {
+                const team = this.state.ref_call;
+                const game_id = this.state.game.game_id;
                 const prediction = {
-                    call:
-                        keys[
-                            res.data.substr(
-                                res.data.length - 3,
-                                res.data.length
-                            )
-                        ],
+                    call: res.data.prediction,
                     team: this.state.match[team + '_team_name'],
                 };
 
-                var toDisplay =
-                    'Here is your prediction: ' +
-                    prediction.call +
-                    '\n\nPlease select OK if the prediction looks correct. Otherwise, press cancel and input your prediction again.';
-                if (window.confirm(toDisplay)) {
-                    if (prediction.call === 'STROKE') {
-                        this.handleScorePlusOne(team + '_player_score', e);
-                    } else if (prediction.call === 'NO LET') {
-                        this.handleScorePlusOne(
-                            this.not(team) + '_player_score',
-                            e
-                        );
+                document.getElementById('processing').style.display = 'none';
+                if (prediction.call == 'inconclusive') {
+                    var toDisplay = "Your prediction was inconclusive. Please select OK to try again."
+                    if (window.confirm(toDisplay)) {
+                        this.handleRefereeCall(team);
+                    } else {
+                        this.closeWebcamModal(true);
                     }
-
-                    this.updatePredictionState(game_id, prediction);
-                    this.closeWebcamModal();
                 } else {
-                    this.handleRefereeCall(team, e);
+                    var toDisplay =
+                        'Here is your prediction: ' +
+                        prediction.call +
+                        '\n\nPlease select OK if the prediction looks correct. Otherwise, press cancel and input your prediction again.';
+
+                    if (window.confirm(toDisplay)) {
+                        if (prediction.call === 'STROKE') {
+                            this.handleScorePlusOne(team + '_player_score', null);
+                        } else if (prediction.call === 'NO LET') {
+                            this.handleScorePlusOne(
+                                this.not(team) + '_player_score', null
+                            );
+                        }
+
+                        this.updatePredictionState(game_id, prediction);
+                        this.closeWebcamModal(false);
+                    } else {
+                        this.handleRefereeCall(team);
+                    }
                 }
             },
             (error) => {
@@ -338,15 +366,32 @@ class GameScoring extends React.Component {
         );
     }
 
-    openWebcamModal() {
+    handleRefereeCall(team) {
+        this.setState({ ref_call: team })
+        this.setState(
+            { images: [] },
+            () => {
+                var interval = setInterval(this.takeImage.bind(this), 50)
+                this.setState({ interval: interval });
+            }
+        )
+    }
+
+    // don't know how to make this wait without setting standard timeout
+    openWebcamModal(e, _callback) {
         this.setState({ webcamEnabled: true }, () => {
+            const team = arguments[2]
             document.getElementById('backdrop').style.display = 'block';
             document.getElementById('webcamModal').style.display = 'block';
             document.getElementById('webcamModal').className += 'show';
+
+            setTimeout(function() {
+                _callback(team);
+            }.bind(_callback, team), 100);
         });
     }
 
-    closeWebcamModal() {
+    closeWebcamModal(reload) {
         document.getElementById('backdrop').style.display = 'none';
         document.getElementById('webcamModal').style.display = 'none';
         document.getElementById(
@@ -355,6 +400,10 @@ class GameScoring extends React.Component {
             .getElementById('webcamModal')
             .className.replace('show', '');
         this.setState({ webcamEnabled: false });
+
+        if (reload) {
+            window.location.reload(false);
+        }
     }
 
     render() {
@@ -362,6 +411,7 @@ class GameScoring extends React.Component {
             width: 1280,
             height: 720,
             aspectRatio: 1,
+            facingMode: 'user',
         };
         return (
             <div>
@@ -538,7 +588,7 @@ class GameScoring extends React.Component {
                                         className="shaded-orange"
                                         type="button"
                                         onClick={(e) =>
-                                            this.handleRefereeCall('home', e)
+                                            this.openWebcamModal(e, this.handleRefereeCall, 'home')
                                         }
                                     >
                                         Referee Call
@@ -567,7 +617,7 @@ class GameScoring extends React.Component {
                                         className="shaded-orange"
                                         type="button"
                                         onClick={(e) =>
-                                            this.handleRefereeCall('away', e)
+                                            this.openWebcamModal(e, this.handleRefereeCall, 'away')
                                         }
                                     >
                                         Referee Call
@@ -642,7 +692,7 @@ class GameScoring extends React.Component {
                                         type="button"
                                         className="close"
                                         aria-label="Close"
-                                        onClick={this.closeWebcamModal}
+                                        onClick={(e) => this.closeWebcamModal(true)}
                                     >
                                         <span aria-hidden="true">×</span>
                                     </button>
@@ -650,12 +700,15 @@ class GameScoring extends React.Component {
                                 <div className="modal-body">
                                     <div className="text-center scoreboard">
                                         <Webcam
-                                            videoConstraints={videoConstraints}
                                             audio={false}
+                                            ref={this.setRef}
+                                            screenshotFormat="image/jpeg"
+                                            videoConstraints={videoConstraints}
                                             mirrored={true}
                                             style={{ width: '100%' }}
                                         />
                                     </div>
+                                    <div id="processing" style={{ display: 'none' }}>Processing...</div>
                                 </div>
                             </div>
                         </div>
