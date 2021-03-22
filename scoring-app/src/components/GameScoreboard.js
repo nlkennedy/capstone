@@ -12,8 +12,8 @@ class GameScoreboard extends React.Component {
 
         this.updateStateFromDatabase = this.updateStateFromDatabase.bind(this);
         this.updateState = this.updateState.bind(this);
-        this.openModal = this.openModal.bind(this);
-        this.closeModal = this.closeModal.bind(this);
+        this.openRefCallModal = this.openRefCallModal.bind(this);
+        this.closeRefCallModal = this.closeRefCallModal.bind(this);
     }
 
     componentDidMount() {
@@ -47,6 +47,7 @@ class GameScoreboard extends React.Component {
     }
 
     updateState() {
+        // get updated state from local storage
         const game_id = window.location.pathname.split('/')[2];
         const game = JSON.parse(localStorage.getItem('game-' + game_id)) || {};
         const match =
@@ -68,7 +69,7 @@ class GameScoreboard extends React.Component {
         // show prediction if exists
         if (Object.keys(prediction).length !== 0) {
             this.setState({ prediction: prediction });
-            this.openModal();
+            this.openRefCallModal();
             localStorage.removeItem('prediction-' + game_id);
         }
 
@@ -79,16 +80,16 @@ class GameScoreboard extends React.Component {
         }
     }
 
-    openModal() {
+    openRefCallModal() {
         document.getElementById('backdrop').style.display = 'block';
         document.getElementById('refCallModal').style.display = 'block';
         document.getElementById('refCallModal').className += 'show';
 
         // close modal after 5 seconds
-        setTimeout(this.closeModal, 5000);
+        setTimeout(this.closeRefCallModal, 5000);
     }
 
-    closeModal() {
+    closeRefCallModal() {
         document.getElementById('backdrop').style.display = 'none';
         document.getElementById('refCallModal').style.display = 'none';
         document.getElementById(
@@ -171,7 +172,7 @@ class GameScoreboard extends React.Component {
                                         type="button"
                                         className="close"
                                         aria-label="Close"
-                                        onClick={this.closeModal}
+                                        onClick={this.closeRefCallModal}
                                     >
                                         <span aria-hidden="true">×</span>
                                     </button>

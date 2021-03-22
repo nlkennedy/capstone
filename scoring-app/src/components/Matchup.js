@@ -18,7 +18,7 @@ class Matchup extends React.Component {
         var game_data = [];
         var $this = this;
 
-        // Get matches summary which contains all match ids
+        // get matches summary which contains all match ids
         const [matches_summary] = await Promise.all([
             axiosInstance.get(`api/matches-summary`, {
                 params: {
@@ -27,7 +27,7 @@ class Matchup extends React.Component {
             }),
         ]);
 
-        // Make request for every match to get the game summary
+        // make request for every match to get the game summary
         axios
             .all(
                 matches_summary.data.matches.map((match) =>
@@ -40,7 +40,7 @@ class Matchup extends React.Component {
             )
             .then(
                 axios.spread(function (...responses) {
-                    // Add game summary to each match
+                    // add game summary to each match
                     game_data = responses.map((response) => response.data);
                     var matches = matches_summary.data.matches.map(function (
                         match,
@@ -61,7 +61,7 @@ class Matchup extends React.Component {
             );
     }
 
-    // Link to a game that doesn't exist
+    // link to a game that doesn't exist (creates a new one)
     handleBeginGame(match_id, game_number, e) {
         e.preventDefault();
         const data = {
@@ -80,7 +80,7 @@ class Matchup extends React.Component {
         );
     }
 
-    // Link to a game that already exists
+    // link to a game that already exists
     handleContinueGame(game_id, e) {
         e.preventDefault();
         window.location.href = '/game/' + game_id + '/scoring';

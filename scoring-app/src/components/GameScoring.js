@@ -15,7 +15,7 @@ class GameScoring extends React.Component {
                 team: 'home', // or "away"
                 side: 'R', // or "L"
             },
-            prev_point: '',
+            prev_point: '', // "home_player_score" or "away_player_score"
             webcamEnabled: false,
             images: [],
             interval: null,
@@ -81,6 +81,7 @@ class GameScoring extends React.Component {
         this.updateDimensions();
     }
 
+    // update dimensions of server side points box
     updateDimensions() {
         document.getElementById('scrollable').style['height'] = 0 + 'px';
         const target_height = document.getElementById('target').clientHeight;
@@ -148,6 +149,7 @@ class GameScoring extends React.Component {
         }
     }
 
+    // predicts where the next serve is from
     updateSelection(team) {
         var selection = this.state.selection;
         if (selection.team === team) {
@@ -161,6 +163,7 @@ class GameScoring extends React.Component {
         this.setState({ selection: selection });
     }
 
+    // checks condition for game over
     gameOver(game) {
         const win_by_two =
             Math.abs(game.home_player_score - game.away_player_score) >= 2;
@@ -207,6 +210,8 @@ class GameScoring extends React.Component {
                         ? 'home_player_score'
                         : 'away_player_score';
                 match[game_winner] += 1;
+
+                // check if match is done
                 const match_winner =
                     match.home_player_score >= 3 ||
                     match.away_player_score >= 3;
@@ -266,6 +271,7 @@ class GameScoring extends React.Component {
             game_number: game_number,
         };
 
+        // create a new game and go to that new page
         axiosInstance.post(`api/games`, data).then(
             (res) => {
                 const game_id = res.data.game_id;
@@ -321,6 +327,7 @@ class GameScoring extends React.Component {
             images: this.state.images,
         };
 
+        // get prediction based on images
         axiosInstance.post(`api/predict_ref_signal`, data).then(
             (res) => {
                 const team = this.state.ref_call;
@@ -330,8 +337,10 @@ class GameScoring extends React.Component {
                     team: this.state.match[team + '_team_name'],
                 };
                 var toDisplay;
+
                 document.getElementById('processing').style.display = 'none';
                 if (prediction.call === 'inconclusive') {
+                    // enforce redo for inconclusive prediction
                     toDisplay =
                         'Your prediction was inconclusive. Please select OK to try again.';
                     if (window.confirm(toDisplay)) {
@@ -340,12 +349,14 @@ class GameScoring extends React.Component {
                         this.closeWebcamModal(true);
                     }
                 } else {
+                    // confirm prediction with user
                     toDisplay =
                         'Here is your prediction: ' +
                         prediction.call +
                         '\n\nPlease select OK if the prediction looks correct. Otherwise, press cancel and input your prediction again.';
 
                     if (window.confirm(toDisplay)) {
+                        // increment scores based on prediction if necessary
                         if (prediction.call === 'STROKE') {
                             this.handleScorePlusOne(
                                 team + '_player_score',
@@ -371,6 +382,7 @@ class GameScoring extends React.Component {
         );
     }
 
+    // take pictures to act as a video
     handleRefereeCall(team) {
         this.setState({ ref_call: team });
         this.setState({ images: [] }, () => {
@@ -379,7 +391,6 @@ class GameScoring extends React.Component {
         });
     }
 
-    // don't know how to make this wait without setting standard timeout
     openWebcamModal(e, _callback) {
         this.setState({ webcamEnabled: true }, () => {
             const team = arguments[2];
@@ -387,6 +398,7 @@ class GameScoring extends React.Component {
             document.getElementById('webcamModal').style.display = 'block';
             document.getElementById('webcamModal').className += 'show';
 
+            // waiting only because the three lines above take a while
             setTimeout(
                 function () {
                     _callback(team);
@@ -406,6 +418,7 @@ class GameScoring extends React.Component {
             .className.replace('show', '');
         this.setState({ webcamEnabled: false });
 
+        // reload the page if necessary to stop pictures from being taken and close camera
         if (reload) {
             window.location.reload(false);
         }
@@ -683,6 +696,7 @@ class GameScoring extends React.Component {
                     </a>
                 </footer>
 
+                {/* ref call webcam modal */}
                 {this.state.webcamEnabled && (
                     <div
                         className="modal fade"

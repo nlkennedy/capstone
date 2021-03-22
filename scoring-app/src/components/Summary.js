@@ -15,7 +15,7 @@ class Summary extends React.Component {
         var game_data = [];
         var $this = this;
 
-        // Get matches summary which contains all match ids
+        // get matches summary which contains all match ids
         const [matches_summary] = await Promise.all([
             axiosInstance.get(`api/matches-summary`, {
                 params: {
@@ -24,7 +24,7 @@ class Summary extends React.Component {
             }),
         ]);
 
-        // Make request for every match to get the game summary
+        // make request for every match to get the game summary
         axios
             .all(
                 matches_summary.data.matches.map((match) =>
@@ -37,7 +37,7 @@ class Summary extends React.Component {
             )
             .then(
                 axios.spread(function (...responses) {
-                    // Add game summary to each match
+                    // add game summary to each match
                     game_data = responses.map((response) => response.data);
                     var matches = matches_summary.data.matches.map(function (
                         match,

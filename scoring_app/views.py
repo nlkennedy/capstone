@@ -54,6 +54,7 @@ def get_prediction(check, bg_model, frame): # pylint: disable=R0914 (too-many-lo
     # smoothing filter
     frame = cv2.bilateralFilter(frame, 5, 50, 100)
 
+    # remove the background only on the first time (based on check)
     if not check:
         bg_model = cv2.createBackgroundSubtractorMOG2(0, 50)
         check = True
@@ -72,14 +73,13 @@ def get_prediction(check, bg_model, frame): # pylint: disable=R0914 (too-many-lo
 
     # generate prediction using trained model
     result = loaded_model.predict(image)
-
     prediction = {}
     for idx, signal in signals.items():
         prediction[signal] = result[0][idx]
         if prediction[signal] >= 0.96:
             proper_prediction = True
 
-    # Sorting based on top prediction
+    # sorting based on top prediction
     prediction = sorted(prediction.items(), key = operator.itemgetter(1), reverse = True)
 
     if proper_prediction is True:
@@ -114,6 +114,7 @@ def predict_ref_signal(request):
         check = False
         bg_model = cv2.createBackgroundSubtractorMOG2(0, 50)
 
+        # get prediction for each image
         for image in images['images']:
             if not image:
                 counter['nodata'] += 1
@@ -123,6 +124,7 @@ def predict_ref_signal(request):
             prediction, check, bg_model = get_prediction(check, bg_model, frame)
             counter[prediction] += 1
 
+        # find top prediction
         counter.pop('none')
         counter.pop('nodata')
         counter.pop('inconclusive')
@@ -165,6 +167,7 @@ def players(request):
     if request.method == 'GET':
         body = request.body.decode('utf-8')
         json_body = json.loads(body)
+
         # verify id
         if not represents_int(json_body['team_id']):
             return HttpResponse(status=400)

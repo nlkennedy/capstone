@@ -39,6 +39,7 @@ class CreateMatchup extends React.Component {
         this.closeValidationModal = this.closeValidationModal.bind(this);
     }
 
+    // update state for every title change
     handleTitleInputChange(event) {
         const target = event.target;
         const value = target.value;
@@ -49,6 +50,7 @@ class CreateMatchup extends React.Component {
         });
     }
 
+    // update state for every form input change
     handleInputChange(event) {
         const target = event.target;
         const value = target.value;
@@ -69,6 +71,7 @@ class CreateMatchup extends React.Component {
 
         // form validation: all fields are required and special characters are not allowed
         var specialChars = /[^a-zA-Z0-9 ]/g;
+
         // validate team names
         if (
             this.state.homeTeam.match(specialChars) ||
@@ -131,6 +134,7 @@ class CreateMatchup extends React.Component {
             matches: matches,
         };
 
+        // create matchup
         axiosInstance.post(`api/teammatches-all`, data).then(
             (res) => {
                 const team_match_id = res.data.team_match_id;
