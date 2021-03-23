@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django-cors-headers = "*"
+django-heroku = "*"
+djangorestframework = "*"
+djangorestframework-jwt = "*"
+gunicorn = "*"
+mysqlclient = "*"
+numpy = "*"
+psycopg2-binary = "*"
+python-decouple = "*"
+python-dotenv = "*"
+scikit-image = "*"
+sklearn = "*"
+tensorflow-cpu = "*"
+whitenoise = "*"
+Django = "*"
+Keras = "*"
+Keras-Preprocessing = "*"
+opencv-python-headless = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
