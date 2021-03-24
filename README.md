@@ -31,12 +31,13 @@ To run frontend and backend separately for development:
 
 ### Creating Frontend Build to Serve
 This must be done before every deploy and `heroku local web` run to see the new changes. 
-1. Delete the `build` folder. 
-2. Delete the `staticfiles` folder. 
-3. Run `yarn build`. 
-4. Move the `scoring-app/build` folder to root. 
-5. Run `python3 manage.py collectstatic`. 
-6. Run `heroku local web` to restart the app. 
+1. Delete the `build` folder: `git rm -r build` or `rm -rf build`
+2. Delete the `staticfiles` folder: `git rm -r staticfiles` or `rm -rf staticfiles`
+3. Run: `yarn build`
+4. Move the `scoring-app/build` folder to root: `mv scoring-app/build .`
+5. Run: `python3 manage.py collectstatic`
+6. Restart the app: `heroku local web`
+7. If committing, be sure to add the new `build` and `staticfiles` folders. 
 
 ### Linting
 * Run pylint: pylint scoring_app
