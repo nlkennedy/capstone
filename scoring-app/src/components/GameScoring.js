@@ -313,7 +313,6 @@ class GameScoring extends React.Component {
     takeImage() {
         if (this.state.images.length > 50) {
             clearInterval(this.state.interval);
-            document.getElementById('processing').style.display = 'block';
             this.handlePrediction();
         } else {
             var images = this.state.images;
@@ -327,6 +326,9 @@ class GameScoring extends React.Component {
             images: this.state.images,
         };
 
+        document.getElementById('note-call').style.display = 'none';
+        document.getElementById('note-processing').style.display = 'block';
+
         // get prediction based on images
         axiosInstance.post(`api/predict_ref_signal`, data).then(
             (res) => {
@@ -338,7 +340,9 @@ class GameScoring extends React.Component {
                 };
                 var toDisplay;
 
-                document.getElementById('processing').style.display = 'none';
+                document.getElementById('note-processing').style.display =
+                    'none';
+
                 if (prediction.call === 'inconclusive') {
                     // enforce redo for inconclusive prediction
                     toDisplay =
@@ -386,6 +390,8 @@ class GameScoring extends React.Component {
     handleRefereeCall(team) {
         this.setState({ ref_call: team });
         this.setState({ images: [] }, () => {
+            document.getElementById('note-loading').style.display = 'none';
+            document.getElementById('note-call').style.display = 'block';
             var interval = setInterval(this.takeImage.bind(this), 50);
             this.setState({ interval: interval });
         });
@@ -397,13 +403,18 @@ class GameScoring extends React.Component {
             document.getElementById('backdrop').style.display = 'block';
             document.getElementById('webcamModal').style.display = 'block';
             document.getElementById('webcamModal').className += 'show';
+            document.getElementById('note-loading').style.display = 'block';
 
-            // waiting only because the three lines above take a while
-            setTimeout(
+            // wait until the camera has loaded and returned a real picture to start saving images
+            var interval = setInterval(
                 function () {
-                    _callback(team);
-                }.bind(_callback, team),
-                100
+                    var image = this.capture();
+                    if (image != null) {
+                        clearInterval(interval);
+                        _callback(team);
+                    }
+                }.bind(this),
+                50
             );
         });
     }
@@ -713,7 +724,7 @@ class GameScoring extends React.Component {
                                         className="modal-title"
                                         id="webcamModalLabel"
                                     >
-                                        Generating prediction!
+                                        Referee Call
                                     </h5>
                                     <button
                                         type="button"
@@ -738,7 +749,19 @@ class GameScoring extends React.Component {
                                         />
                                     </div>
                                     <div
-                                        id="processing"
+                                        id="note-loading"
+                                        style={{ display: 'none' }}
+                                    >
+                                        Loading...
+                                    </div>
+                                    <div
+                                        id="note-call"
+                                        style={{ display: 'none' }}
+                                    >
+                                        Make Your Call
+                                    </div>
+                                    <div
+                                        id="note-processing"
                                         style={{ display: 'none' }}
                                     >
                                         Processing...
