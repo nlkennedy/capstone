@@ -311,7 +311,7 @@ class GameScoring extends React.Component {
     }
 
     takeImage() {
-        if (this.state.images.length > 30) {
+        if (this.state.images.length > 15) {
             clearInterval(this.state.interval);
             this.handlePrediction();
         } else {
@@ -392,7 +392,7 @@ class GameScoring extends React.Component {
         this.setState({ images: [] }, () => {
             document.getElementById('note-loading').style.display = 'none';
             document.getElementById('note-call').style.display = 'block';
-            var interval = setInterval(this.takeImage.bind(this), 80);
+            var interval = setInterval(this.takeImage.bind(this), 100);
             this.setState({ interval: interval });
         });
     }
