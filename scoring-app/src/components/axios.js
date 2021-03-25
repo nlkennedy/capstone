@@ -3,7 +3,10 @@ require('dotenv').config();
 
 // these settings are used for all API calls
 const axiosInstance = axios.create({
-    baseURL: 'https://intellisquash.herokuapp.com/', //process.env.REACT_APP_BACKEND || 'http://localhost:5000/',
+    baseURL:
+        process.env.NODE_ENV === 'production'
+            ? 'https://intellisquash.herokuapp.com/'
+            : 'http://127.0.0.1:8000/',
     xsrfCookieName: 'csrftoken',
     xsrfHeaderName: 'X-CSRFToken',
 });
