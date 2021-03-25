@@ -39,6 +39,17 @@ This must be done before every deploy and `heroku local web` run to see the new 
 6. Restart the app: `heroku local web`
 7. If committing, be sure to add the new `build` and `staticfiles` folders. 
 
+Or, run it altogether: 
+```
+git rm -r build;
+git rm -r staticfiles;
+yarn build;
+mv scoring-app/build .;
+python3 manage.py collectstatic;
+git add build;
+git add staticfiles;
+```
+
 ### Linting
 * Run pylint: pylint scoring_app
 * Run eslint: yarn eslint
