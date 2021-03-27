@@ -388,7 +388,8 @@ class GameScoring extends React.Component {
 
     // take pictures to act as a video
     handleRefereeCall(team) {
-        this.setState({ ref_call: team }, () => {
+        this.setState({ ref_call: team });
+        this.setState({ images: [] }, () => {
             document.getElementById('note-loading').style.display = 'none';
             document.getElementById('note-call').style.display = 'block';
             var interval = setInterval(this.takeImage.bind(this), 100);
@@ -410,7 +411,6 @@ class GameScoring extends React.Component {
                     var image = this.capture();
                     if (image != null) {
                         clearInterval(interval);
-                        this.setState({ images: [image] });
                         _callback(team);
                     }
                 }.bind(this),
