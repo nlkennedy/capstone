@@ -13,8 +13,9 @@ This app is a squash game scoring app originally built for the Tufts Squash team
 1. `cd <PATH TO DIRECTORY YOU WANT YOUR CODE TO BE IN>`
 1. Clone repo: `git clone https://github.com/nlkennedy/referee-signal-recognition.git`
 2. `cd referee-signal-recognition`
-3. Install backend requirements: `pip3 install -r requirements.txt`
-4. Install frontend requirements: `yarn install` (see frontend README for more details)
+3. Install postgresql: `brew install postgresql`
+5. Install backend requirements: `pip3 install -r requirements.txt`
+6. Install frontend requirements: `yarn install` (see frontend README for more details)
 
 ### Add instructions for database setup
 
