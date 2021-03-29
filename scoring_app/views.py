@@ -8,6 +8,7 @@ import base64
 import operator
 import cv2
 import numpy as np
+import subprocess
 from keras.models import load_model
 from skimage.transform import resize
 from imageio import imread
@@ -415,6 +416,12 @@ def matches_summary(request):
 def games(request): # pylint: disable=R0911 (too-many-return-statements)
     if request.method == 'GET':
         game_id = request.GET['game_id']
+
+        # casting scoreboard of current game to chromecast
+        # TODO: make it so that each ipad/game is hooked to some specific chromecast
+        # in each squash court
+        cast = "https://intellisquash.herokuapp.com/game/" + game_id + "/scoreboard"
+        subprocess.run(["catt", "-d", "Chromey", "cast_site", cast])
 
         # verify id
         if not represents_int(game_id):

@@ -174,20 +174,6 @@ class GameScoring extends React.Component {
     }
 
     handleScorePlusOne(team_score, e) {
-        const cjs = new Castjs();
-
-        if (cjs.available) {
-            // Initiate new cast session
-            console.log("CJS SUCCESS")
-            console.log("DEVICE NAME: ", cjs.device)
-            cjs.cast(
-                'www.nba.com'
-            );
-        }
-        else {
-            console.log("CJS ERROR")
-        }
-
         if (e) {
             e.preventDefault();
         }
