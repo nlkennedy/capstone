@@ -398,25 +398,27 @@ class GameScoring extends React.Component {
     }
 
     openWebcamModal(e, _callback) {
-        this.setState({ webcamEnabled: true }, () => {
-            const team = arguments[2];
-            document.getElementById('backdrop').style.display = 'block';
-            document.getElementById('webcamModal').style.display = 'block';
-            document.getElementById('webcamModal').className += 'show';
-            document.getElementById('note-loading').style.display = 'block';
+        if (!this.state.game.done) {
+            this.setState({ webcamEnabled: true }, () => {
+                const team = arguments[2];
+                document.getElementById('backdrop').style.display = 'block';
+                document.getElementById('webcamModal').style.display = 'block';
+                document.getElementById('webcamModal').className += 'show';
+                document.getElementById('note-loading').style.display = 'block';
 
-            // wait until the camera has loaded and returned a real picture to start saving images
-            var interval = setInterval(
-                function () {
-                    var image = this.capture();
-                    if (image != null) {
-                        clearInterval(interval);
-                        _callback(team);
-                    }
-                }.bind(this),
-                50
-            );
-        });
+                // wait until the camera has loaded and returned a real picture to start saving images
+                var interval = setInterval(
+                    function () {
+                        var image = this.capture();
+                        if (image != null) {
+                            clearInterval(interval);
+                            _callback(team);
+                        }
+                    }.bind(this),
+                    50
+                );
+            });
+        }
     }
 
     closeWebcamModal(reload) {

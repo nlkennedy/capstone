@@ -13,8 +13,9 @@ This app is a squash game scoring app originally built for the Tufts Squash team
 1. `cd <PATH TO DIRECTORY YOU WANT YOUR CODE TO BE IN>`
 1. Clone repo: `git clone https://github.com/nlkennedy/referee-signal-recognition.git`
 2. `cd referee-signal-recognition`
-3. Install backend requirements: `pip3 install -r requirements.txt`
-4. Install frontend requirements: `yarn install` (see frontend README for more details)
+3. Install postgresql: `brew install postgresql`
+5. Install backend requirements: `pip3 install -r requirements.txt`
+6. Install frontend requirements: `yarn install` (see frontend README for more details)
 
 ### Add instructions for database setup
 
@@ -38,6 +39,9 @@ This must be done before every deploy and `heroku local web` run to see the new 
 5. Run: `python3 manage.py collectstatic`
 6. Restart the app: `heroku local web`
 7. If committing, be sure to add the new `build` and `staticfiles` folders. 
+
+Or, run this script that has all of the commands: `./create-build.sh`
+If you don't have permission to run this script, run this and try again: `chmod +x create-build.sh`
 
 ### Linting
 * Run pylint: pylint scoring_app
