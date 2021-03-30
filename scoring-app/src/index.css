@@ -116,11 +116,15 @@ code {
     background-color: #cdb58c;
     border: 1px solid #6c757d;
     padding: 5%;
+    -webkit-appearance: none;
+    border-radius: 0;
 }
 
 .game-button {
     border: 1px solid #6c757d;
     padding: 5%;
+    -webkit-appearance: none;
+    border-radius: 0;
 }
 
 .scrollable {
