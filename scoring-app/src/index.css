@@ -146,12 +146,55 @@ code {
     background-color: #6c757d;
 }
 
+/* CHANGE ALL HEADERS ADD CLASSES */
+
+/* Mobile responsiveness for small devices */
+@media (max-width: 500px) {
+    body {
+        font-size: 0.25rem;
+    }
+    h1,
+    .heading-size-1 {
+        font-size: 1.5rem;
+    }
+    h2,
+    .heading-size-2 {
+        font-size: 1.25rem;
+    }
+    h3,
+    .heading-size-3 {
+        font-size: 1rem;
+    }
+    h4,
+    .heading-size-4 {
+        font-size: 0.75rem;
+    }
+    h5,
+    .heading-size-5 {
+        font-size: 0.5rem;
+    }
+    h6,
+    .heading-size-6 {
+        font-size: 0.25rem;
+    }
+}
+
+/* DEFAULT SIZES
+    body{font-size: 0.5rem}
+    h1{font-size: 2rem;}
+    h2{font-size: 1.5rem;}
+    h3{font-size: 1.2rem;}
+    h4{font-size: 1.5rem;}
+    h5{font-size: 1.25rem;}
+    h6{font-size: 0.5rem;}
+*/
+
 /* 
 COLORS
-  light gray: #f8f9fa (light)
-  dark gray: #6c757d (secondary)
-  navy: #474d65
-  red: #a86760
-  orange: #cdb58c
-  yellow: #dfd8ab
+    light gray: #f8f9fa (light)
+    dark gray: #6c757d (secondary)
+    navy: #474d65
+    red: #a86760
+    orange: #cdb58c
+    yellow: #dfd8ab
 */
