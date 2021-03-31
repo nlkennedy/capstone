@@ -527,7 +527,7 @@ class GameScoring extends React.Component {
                                             <h3
                                                 id="home-L"
                                                 className="heading-size-3 serve-change game-button"
-                                                type="button"
+                                                // type="button"
                                                 onClick={this.handleServeChange}
                                             >
                                                 L
@@ -539,7 +539,7 @@ class GameScoring extends React.Component {
                                             <h3
                                                 id="home-R"
                                                 className="heading-size-3 serve-change game-button shaded-blue"
-                                                type="button"
+                                                // type="button"
                                                 onClick={this.handleServeChange}
                                             >
                                                 R
@@ -595,7 +595,7 @@ class GameScoring extends React.Component {
                                             <h3
                                                 id="away-L"
                                                 className="heading-size-3 serve-change game-button"
-                                                type="button"
+                                                // type="button"
                                                 onClick={this.handleServeChange}
                                             >
                                                 L
@@ -607,7 +607,7 @@ class GameScoring extends React.Component {
                                             <h3
                                                 id="away-R"
                                                 className="heading-size-3 serve-change game-button"
-                                                type="button"
+                                                // type="button"
                                                 onClick={this.handleServeChange}
                                             >
                                                 R
@@ -619,8 +619,8 @@ class GameScoring extends React.Component {
                             <div className="row">
                                 <div className="col-4">
                                     <h5
-                                        className="heading-size-5 shaded-orange"
-                                        type="button"
+                                        className="heading-size-5 game-button shaded-orange"
+                                        // type="button"
                                         onClick={(e) =>
                                             this.openWebcamModal(
                                                 e,
@@ -637,7 +637,7 @@ class GameScoring extends React.Component {
                                         !this.state.game.done && (
                                             <h5
                                                 className="heading-size-5 shaded-red game-button"
-                                                type="button"
+                                                // type="button"
                                                 onClick={this.handleUndo}
                                             >
                                                 Undo
@@ -652,8 +652,8 @@ class GameScoring extends React.Component {
                                 </div>
                                 <div className="col-4">
                                     <h5
-                                        className="heading-size-5 shaded-orange"
-                                        type="button"
+                                        className="heading-size-5 game-button shaded-orange"
+                                        // type="button"
                                         onClick={(e) =>
                                             this.openWebcamModal(
                                                 e,
@@ -671,7 +671,7 @@ class GameScoring extends React.Component {
                                     {this.state.game.done &&
                                         !this.state.match.done && (
                                             <button
-                                                type="button"
+                                                // type="button"
                                                 className="btn btn-secondary btn-block btn-lg"
                                                 onClick={(e) =>
                                                     this.handleBeginNextGame(
