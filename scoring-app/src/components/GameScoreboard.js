@@ -8,25 +8,21 @@ class GameScoreboard extends React.Component {
             game: {},
             match: {},
             prediction: {},
+            interval: null,
         };
 
         this.updateStateFromDatabase = this.updateStateFromDatabase.bind(this);
-        this.updateState = this.updateState.bind(this);
         this.openRefCallModal = this.openRefCallModal.bind(this);
         this.closeRefCallModal = this.closeRefCallModal.bind(this);
     }
 
     componentDidMount() {
-        if (typeof window !== 'undefined') {
-            window.addEventListener('storage', this.updateState);
-        }
-        this.updateState();
+        var interval = setInterval(this.updateStateFromDatabase, 1000);
+        this.setState({ interval: interval });
     }
 
     componentWillUnmount() {
-        if (typeof window !== 'undefined') {
-            window.removeEventListener('storage', this.updateState);
-        }
+        clearInterval(this.state.interval);
     }
 
     updateStateFromDatabase() {
@@ -43,41 +39,38 @@ class GameScoreboard extends React.Component {
                     game: data.game_data,
                     match: data.match_data,
                 });
+
+                // show prediction if exists
+                const prediction = data.game_data.prediction;
+                if (prediction) {
+                    this.handlePrediction(game_id, prediction);
+                }
+
+                // redirect if a new game starts
+                const next_game = data.game_data.next_game;
+                if (next_game) {
+                    this.handleNextGame(next_game);
+                }
             });
     }
 
-    updateState() {
-        // get updated state from local storage
-        const game_id = window.location.pathname.split('/')[2];
-        const game = JSON.parse(localStorage.getItem('game-' + game_id)) || {};
-        const match =
-            JSON.parse(localStorage.getItem('match-' + game_id)) || {};
-        const prediction =
-            JSON.parse(localStorage.getItem('prediction-' + game_id)) || {};
-        const new_game = localStorage.getItem('newgame-' + game_id) || '';
+    handlePrediction(game_id, game_prediction) {
+        const prediction = JSON.parse(game_prediction);
+        this.setState({ prediction: prediction }, () => {
+            axiosInstance
+                .get(`api/games-prediction`, {
+                    params: {
+                        game_id: game_id,
+                    },
+                })
+                .then((res) => {
+                    this.openRefCallModal();
+                });
+        });
+    }
 
-        // update state
-        if (Object.keys(game).length === 0 || Object.keys(match).length === 0) {
-            this.updateStateFromDatabase();
-        } else {
-            this.setState({
-                game: game,
-                match: match,
-            });
-        }
-
-        // show prediction if exists
-        if (Object.keys(prediction).length !== 0) {
-            this.setState({ prediction: prediction });
-            this.openRefCallModal();
-            localStorage.removeItem('prediction-' + game_id);
-        }
-
-        // redirect if a new game starts
-        if (new_game !== '') {
-            localStorage.removeItem('newgame-' + game_id);
-            window.location.href = '/game/' + new_game + '/scoreboard';
-        }
+    handleNextGame(next_game) {
+        window.location.href = '/game/' + next_game + '/scoreboard';
     }
 
     openRefCallModal() {

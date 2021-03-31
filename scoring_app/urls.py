@@ -7,6 +7,8 @@ urlpatterns = [
     path('api/teammatches-summary', views.teammatches_summary),
     path('api/teammatches-all', views.teammatches_all),
     path('api/games', views.games),
+    path('api/games-prediction', views.games_prediction),
+    path('api/games-next-game', views.games_next_game),
     path('api/games-summary', views.games_summary),
     path('api/matches', views.matches),
     path('api/matches-summary', views.matches_summary),
