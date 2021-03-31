@@ -461,27 +461,27 @@ class GameScoring extends React.Component {
                         >
                             <div className="row">
                                 <div className="col-4">
-                                    <h4 className="heading-size-4 shaded-gray">
+                                    <h4 className="heading-size-4 shaded-gray text-break">
                                         {this.state.match.home_team_name}
                                     </h4>
                                 </div>
                                 <div className="col-4 align-self-center">
-                                    <h6 className="heading-size-6">
+                                    <h5 className="heading-size-5">
                                         {' '}
                                         {
                                             this.state.match.home_player_score
                                         } | {this.state.match.away_player_score}{' '}
-                                    </h6>
+                                    </h5>
                                 </div>
                                 <div className="col-4">
-                                    <h4 className="heading-size-4 shaded-gray">
+                                    <h4 className="heading-size-4 shaded-gray text-break">
                                         {this.state.match.away_team_name}
                                     </h4>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col-4">
-                                    <h5 className="heading-size-5 shaded-gray">
+                                    <h5 className="heading-size-5 shaded-gray text-break">
                                         <span>
                                             {this.state.match.home_player_name}
                                         </span>
@@ -494,7 +494,7 @@ class GameScoring extends React.Component {
                                     </h1>
                                 </div>
                                 <div className="col-4">
-                                    <h5 className="heading-size-5 shaded-gray">
+                                    <h5 className="heading-size-5 shaded-gray text-break">
                                         <span>
                                             {this.state.match.away_player_name}
                                         </span>
@@ -527,7 +527,6 @@ class GameScoring extends React.Component {
                                             <h3
                                                 id="home-L"
                                                 className="heading-size-3 serve-change game-button"
-                                                // type="button"
                                                 onClick={this.handleServeChange}
                                             >
                                                 L
@@ -539,7 +538,6 @@ class GameScoring extends React.Component {
                                             <h3
                                                 id="home-R"
                                                 className="heading-size-3 serve-change game-button shaded-blue"
-                                                // type="button"
                                                 onClick={this.handleServeChange}
                                             >
                                                 R
@@ -595,7 +593,6 @@ class GameScoring extends React.Component {
                                             <h3
                                                 id="away-L"
                                                 className="heading-size-3 serve-change game-button"
-                                                // type="button"
                                                 onClick={this.handleServeChange}
                                             >
                                                 L
@@ -607,7 +604,6 @@ class GameScoring extends React.Component {
                                             <h3
                                                 id="away-R"
                                                 className="heading-size-3 serve-change game-button"
-                                                // type="button"
                                                 onClick={this.handleServeChange}
                                             >
                                                 R
@@ -620,7 +616,6 @@ class GameScoring extends React.Component {
                                 <div className="col-4">
                                     <h5
                                         className="heading-size-5 game-button shaded-orange"
-                                        // type="button"
                                         onClick={(e) =>
                                             this.openWebcamModal(
                                                 e,
@@ -637,7 +632,6 @@ class GameScoring extends React.Component {
                                         !this.state.game.done && (
                                             <h5
                                                 className="heading-size-5 shaded-red game-button"
-                                                // type="button"
                                                 onClick={this.handleUndo}
                                             >
                                                 Undo
@@ -653,7 +647,6 @@ class GameScoring extends React.Component {
                                 <div className="col-4">
                                     <h5
                                         className="heading-size-5 game-button shaded-orange"
-                                        // type="button"
                                         onClick={(e) =>
                                             this.openWebcamModal(
                                                 e,
@@ -671,7 +664,6 @@ class GameScoring extends React.Component {
                                     {this.state.game.done &&
                                         !this.state.match.done && (
                                             <button
-                                                // type="button"
                                                 className="btn btn-secondary btn-block btn-lg"
                                                 onClick={(e) =>
                                                     this.handleBeginNextGame(
