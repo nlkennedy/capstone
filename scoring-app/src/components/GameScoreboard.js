@@ -17,7 +17,7 @@ class GameScoreboard extends React.Component {
     }
 
     componentDidMount() {
-        var interval = setInterval(this.updateStateFromDatabase, 1000);
+        var interval = setInterval(this.updateStateFromDatabase, 3000);
         this.setState({ interval: interval });
     }
 
