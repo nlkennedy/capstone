@@ -167,14 +167,17 @@ class CreateMatchup extends React.Component {
         const team_match_length = 9;
         return (
             <div className="container">
-                <h1 style={{ marginTop: '5%', marginBottom: '5%' }}>
+                <h1
+                    className="heading-size-1"
+                    style={{ marginTop: '5%', marginBottom: '5%' }}
+                >
                     New Team Matchup
                 </h1>
 
                 <form className="form-box" onSubmit={this.handleSubmit}>
                     <div className="matchup-row form-row">
                         <div className="col-sm-1">
-                            <h4>#</h4>
+                            <h4 className="heading-size-4">#</h4>
                         </div>
                         <div className="col-sm-4">
                             <div className="form-group">
@@ -201,14 +204,14 @@ class CreateMatchup extends React.Component {
                             </div>
                         </div>
                         <div className="col-sm-3">
-                            <h4>Court</h4>
+                            <h4 className="heading-size-4">Court</h4>
                         </div>
                     </div>
 
                     {[...Array(team_match_length)].map((e, i) => (
                         <div key={'match' + i} className="form-row">
                             <div className="col-sm-1 form-group">
-                                <h4>{i + 1}</h4>
+                                <h4 className="heading-size-4">{i + 1}</h4>
                             </div>
                             <div className="col-sm-4 form-group">
                                 <input
@@ -262,7 +265,7 @@ class CreateMatchup extends React.Component {
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5
-                                    className="modal-title"
+                                    className="heading-size-5 modal-title"
                                     id="validationModalLabel"
                                 >
                                     Please review your submission.

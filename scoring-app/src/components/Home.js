@@ -33,7 +33,10 @@ class Home extends React.Component {
                         </div>
 
                         <div>
-                            <h4 style={{ marginTop: '5%' }}>
+                            <h4
+                                className="heading-size-4"
+                                style={{ marginTop: '5%' }}
+                            >
                                 Incomplete Team Matchups
                             </h4>
                             <table className="table table-hover table-striped">
@@ -87,7 +90,10 @@ class Home extends React.Component {
                         </div>
 
                         <div>
-                            <h4 style={{ marginTop: '5%' }}>
+                            <h4
+                                className="heading-size-4"
+                                style={{ marginTop: '5%' }}
+                            >
                                 Completed Team Matchups
                             </h4>
                             <table className="table table-hover table-striped">

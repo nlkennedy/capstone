@@ -10,7 +10,7 @@ class About extends React.Component {
                         className="container"
                         style={{ marginTop: '5%' }}
                     >
-                        <h1> About </h1>
+                        <h1 className="heading-size-1"> About </h1>
                         <div
                             style={{
                                 marginTop: '2%',
