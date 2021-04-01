@@ -64,8 +64,16 @@ class Summary extends React.Component {
             <div>
                 <div id="wrap">
                     <div id="main" className="container">
-                        <h1 style={{ marginTop: '5%' }}>Matchup Summary</h1>
-                        <h2 style={{ marginBottom: '5%' }}>
+                        <h1
+                            className="heading-size-1"
+                            style={{ marginTop: '5%' }}
+                        >
+                            Matchup Summary
+                        </h1>
+                        <h2
+                            className="heading-size-2"
+                            style={{ marginBottom: '5%' }}
+                        >
                             {this.state.info.home_team_name} vs{' '}
                             {this.state.info.away_team_name}{' '}
                         </h2>

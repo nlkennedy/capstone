@@ -18,9 +18,8 @@ This app is a squash game scoring app originally built for the Tufts Squash team
 6. Install frontend requirements: `yarn install` (see frontend README for more details)
 
 ### Database setup
-1. run `python3 manage.py makemigrations`
-2. run `python3 manage.py migrate`
-
+1. Run `python3 manage.py makemigrations`
+2. Run `python3 manage.py migrate`
 
 ### Run Project on Local Machine
 * `heroku local web`

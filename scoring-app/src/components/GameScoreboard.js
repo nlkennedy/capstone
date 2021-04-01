@@ -102,38 +102,41 @@ class GameScoreboard extends React.Component {
     render() {
         return (
             <div className="container" style={{ marginBottom: '5%' }}>
-                <h1 style={{ marginTop: '5%', marginBottom: '5%' }}>
+                <h1
+                    className="heading-size-1"
+                    style={{ marginTop: '5%', marginBottom: '5%' }}
+                >
                     Game Scoreboard
                 </h1>
 
                 <div className="container shaded-gray">
                     <div className="row">
                         <div className="col-4">
-                            <h4 className="text-left">
+                            <h4 className="heading-size-4 text-left text-break">
                                 {this.state.match.home_team_name}
                             </h4>
                         </div>
                         <div className="col-4"></div>
                         <div className="col-4">
-                            <h4 className="text-right">
+                            <h4 className="heading-size-4 text-right text-break">
                                 {this.state.match.away_team_name}
                             </h4>
                         </div>
                     </div>
                     <div className="row">
                         <div className="col-5 shaded-dark-gray my-auto pt-2 pb-1">
-                            <h3 className="text-left text-light">
+                            <h3 className="heading-size-3 text-left text-light text-break">
                                 {this.state.match.home_player_name}
                             </h3>
                         </div>
                         <div className="col-2 align-self-center text-nowrap">
-                            <h1>
+                            <h1 className="heading-size-1">
                                 {this.state.match.home_player_score} |{' '}
                                 {this.state.match.away_player_score}
                             </h1>
                         </div>
                         <div className="col-5 shaded-dark-gray my-auto pt-2 pb-1">
-                            <h3 className="text-right text-light">
+                            <h3 className="heading-size-3 text-right text-light text-break">
                                 {this.state.match.away_player_name}
                             </h3>
                         </div>
@@ -162,7 +165,7 @@ class GameScoreboard extends React.Component {
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <h5
-                                        className="modal-title"
+                                        className="heading-size-5 modal-title"
                                         id="refCallModalLabel"
                                     >
                                         Referee Call Requested By{' '}
