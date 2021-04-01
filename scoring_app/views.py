@@ -354,7 +354,7 @@ def matches(request): # pylint: disable=R0911 (too-many-return-statements)
             match.home_player_score = data['home_player_score']
             match.away_player_score = data['away_player_score']
             match.done = data['done']
-            match.save()
+            match.save(update_fields=["home_player_score", "away_player_score", "done"])
 
             # check if teammatch is done and update as necesary
             all_matches = Matches.objects.filter(team_match_id=match.team_match_id.pk)
@@ -427,7 +427,9 @@ def games(request): # pylint: disable=R0911 (too-many-return-statements)
             'home_player_score': game.home_player_score,
             'away_player_score': game.away_player_score,
             'game_number': game.game_number,
-            'done': game.done
+            'done': game.done,
+            'prediction': game.prediction,
+            'next_game': game.next_game,
         }
 
         match_data = {
@@ -483,10 +485,66 @@ def games(request): # pylint: disable=R0911 (too-many-return-statements)
             game.home_player_score = data['home_player_score']
             game.away_player_score = data['away_player_score']
             game.done = data['done']
-            game.save()
+            game.save(update_fields=["home_player_score", "away_player_score", "done"])
 
             response_data = json.dumps({'game_id': game.pk})
             return HttpResponse(response_data, content_type='application/json')
+        except:
+            return HttpResponse(status=500)
+
+    return HttpResponse(status=201)
+
+@csrf_exempt
+def games_prediction(request): # pylint: disable=R0911 (too-many-return-statements)
+    if request.method == 'GET':
+        try:
+            game_id = request.GET['game_id']
+
+            # verify id
+            if not represents_int(game_id):
+                return HttpResponse(status=400)
+
+            # reset prediction
+            game = Games.objects.get(pk=game_id)
+            game.prediction = None
+            game.save(update_fields=["prediction"])
+            return HttpResponse(status=200)
+        except:
+            return HttpResponse(status=500)
+
+    if request.method == 'PATCH':
+        try:
+            body = request.body.decode('utf-8')
+            data = json.loads(body)
+
+            # verify id
+            if not represents_int(data['game_id']):
+                return HttpResponse(status=400)
+
+            game = Games.objects.get(pk=data['game_id'])
+            game.prediction = data['prediction']
+            game.save(update_fields=["prediction"])
+            return HttpResponse(status=200)
+        except:
+            return HttpResponse(status=500)
+
+    return HttpResponse(status=200)
+
+@csrf_exempt
+def games_next_game(request):
+    if request.method == 'PATCH':
+        try:
+            body = request.body.decode('utf-8')
+            data = json.loads(body)
+
+            # verify id
+            if not represents_int(data['game_id']):
+                return HttpResponse(status=400)
+
+            game = Games.objects.get(pk=data['game_id'])
+            game.next_game = data['next_game']
+            game.save(update_fields=["next_game"])
+            return HttpResponse(status=200)
         except:
             return HttpResponse(status=500)
 

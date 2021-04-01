@@ -31,8 +31,6 @@ class GameScoring extends React.Component {
         this.getInitialPointsState = this.getInitialPointsState.bind(this);
         this.removePointsState = this.removePointsState.bind(this);
         this.updatePointsState = this.updatePointsState.bind(this);
-        this.removeScoreboardState = this.removeScoreboardState.bind(this);
-        this.updateScoreboardState = this.updateScoreboardState.bind(this);
         this.updateScoreboardLocation = this.updateScoreboardLocation.bind(
             this
         );
@@ -42,6 +40,7 @@ class GameScoring extends React.Component {
         this.handleUndo = this.handleUndo.bind(this);
         this.takeImage = this.takeImage.bind(this);
         this.handlePrediction = this.handlePrediction.bind(this);
+        this.updateDatabaseGame = this.updateDatabaseGame.bind(this);
     }
 
     componentDidMount() {
@@ -63,14 +62,12 @@ class GameScoring extends React.Component {
                 window.addEventListener('load', this.handleLoad);
                 window.addEventListener('resize', this.updateDimensions);
                 this.updateDimensions();
-                this.updateScoreboardState(game_id);
             });
     }
 
     componentWillUnmount() {
         window.removeEventListener('load', this.handleLoad);
         window.removeEventListener('resize', this.updateDimensions);
-        this.removeScoreboardState();
     }
 
     componentDidUpdate() {
@@ -91,11 +88,34 @@ class GameScoring extends React.Component {
         }
     }
 
-    // functions to deal with local storange for predictions
     updatePredictionState(game_id, prediction) {
-        localStorage.setItem(
-            'prediction-' + game_id,
-            JSON.stringify(prediction)
+        const data = {
+            game_id: game_id,
+            prediction: JSON.stringify(prediction),
+        };
+
+        axiosInstance.patch(`api/games-prediction`, data).then(
+            (res) => {},
+            (error) => {
+                console.log(error);
+            }
+        );
+    }
+
+    updateScoreboardLocation(new_game) {
+        const game_id = this.state.game.game_id;
+        const data = {
+            game_id: game_id,
+            next_game: new_game,
+        };
+
+        axiosInstance.patch(`api/games-next-game`, data).then(
+            (res) => {
+                window.location.href = '/game/' + new_game + '/scoring';
+            },
+            (error) => {
+                console.log(error);
+            }
         );
     }
 
@@ -111,29 +131,6 @@ class GameScoring extends React.Component {
     updatePointsState(game_id, points) {
         this.setState({ points: points });
         localStorage.setItem('points-' + game_id, JSON.stringify(points));
-    }
-
-    // functions to deal with local storange for scoreboard state
-    removeScoreboardState() {
-        const game_id = this.state.game.game_id;
-        localStorage.removeItem('game-' + game_id);
-        localStorage.removeItem('match-' + game_id);
-    }
-
-    updateScoreboardState(game_id) {
-        localStorage.setItem(
-            'game-' + game_id,
-            JSON.stringify(this.state.game)
-        );
-        localStorage.setItem(
-            'match-' + game_id,
-            JSON.stringify(this.state.match)
-        );
-    }
-
-    updateScoreboardLocation(new_game) {
-        const game_id = this.state.game.game_id;
-        localStorage.setItem('newgame-' + game_id, new_game);
     }
 
     // returns the opposite selection
@@ -195,13 +192,11 @@ class GameScoring extends React.Component {
                 points.push(['', point]);
             }
             this.updatePointsState(game.game_id, points);
-            this.updateScoreboardState(game.game_id);
 
             // check if game over and update done fields as necessary
             if (this.gameOver(game)) {
                 game.done = true;
                 this.removePointsState(game.game_id);
-                this.removeScoreboardState(game.game_data);
 
                 // update match in database
                 var match = this.state.match;
@@ -236,14 +231,7 @@ class GameScoring extends React.Component {
             game: game,
             prev_point: team_score,
         });
-
-        // update game in database
-        axiosInstance.patch(`api/games`, this.state.game).then(
-            (res) => {},
-            (error) => {
-                console.log(error);
-            }
-        );
+        this.updateDatabaseGame(game);
     }
 
     // undos only one point at a time
@@ -261,7 +249,16 @@ class GameScoring extends React.Component {
         });
 
         this.updatePointsState(game.game_id, points);
-        this.updateScoreboardState(game.game_id);
+        this.updateDatabaseGame(game);
+    }
+
+    updateDatabaseGame(game) {
+        axiosInstance.patch(`api/games`, game).then(
+            (res) => {},
+            (error) => {
+                console.log(error);
+            }
+        );
     }
 
     handleBeginNextGame(match_id, game_number, e) {
@@ -276,7 +273,6 @@ class GameScoring extends React.Component {
             (res) => {
                 const game_id = res.data.game_id;
                 this.updateScoreboardLocation(game_id);
-                window.location.href = '/game/' + game_id + '/scoring';
             },
             (error) => {
                 console.log(error);

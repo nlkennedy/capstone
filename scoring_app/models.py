@@ -38,3 +38,5 @@ class Games(models.Model):
     away_player_score = models.IntegerField(default=0)
     game_number = models.IntegerField()
     done = models.BooleanField(default=False)
+    prediction = models.CharField(max_length=255,null=True,default=None)
+    next_game = models.IntegerField(null=True,default=None)
