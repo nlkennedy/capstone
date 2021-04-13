@@ -53,6 +53,11 @@ class Matchup extends React.Component {
                         return match;
                     });
 
+                    // sort matches by match_rank
+                    matches.sort((a, b) =>
+                        a.match_rank > b.match_rank ? 1 : -1
+                    );
+
                     $this.setState({
                         info: matches_summary.data,
                         matches: matches,
