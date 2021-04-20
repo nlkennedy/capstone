@@ -3,6 +3,9 @@
 ### About
 This app is a squash game scoring app originally built for the Tufts Squash team. The application scores and tracks all games, and our main feature is a machine learning model that uses live video to read referee hand signals to aid in scoring the games. Built for Tufts Senior Capstone 2020 - 2021. 
 
+### Link
+https://intellisquash.herokuapp.com/
+
 ### Team Members
 * Ben Bodine
 * Radhika Joshi
